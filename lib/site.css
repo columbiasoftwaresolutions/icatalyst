@@ -1,0 +1,152 @@
+/* ============================================================================
+   iCatalyst — motion + graphics layer. Calm, on-brand: short eased fades,
+   subtle loops, no bounce. Honors prefers-reduced-motion.
+   ============================================================================ */
+
+/* ---- Scroll reveal --------------------------------------------------------- */
+.ic-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s cubic-bezier(.2,.6,.2,1), transform .7s cubic-bezier(.2,.6,.2,1);
+  will-change: opacity, transform;
+}
+.ic-reveal.ic-in { opacity: 1; transform: none; }
+
+/* ---- Hover lift (cards / tiles) ------------------------------------------- */
+.ic-lift { transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+.ic-lift:hover { transform: translateY(-3px); }
+.ic-lift-light:hover { border-color: rgba(0,0,0,0.28) !important; }
+.ic-lift-dark:hover { border-color: #3a3a55 !important; }
+
+/* ---- Animated brand-gradient surface -------------------------------------- */
+.ic-gradient-anim {
+  background: linear-gradient(100deg, var(--accent-magenta) 0%, var(--accent-periwinkle) 55%, var(--accent-mint) 100%);
+  background-size: 220% 220%;
+  animation: ic-grad 9s ease-in-out infinite;
+}
+.ic-gradient-bar {
+  height: 4px; border-radius: 9999px;
+  background: linear-gradient(100deg, var(--accent-magenta) 0%, var(--accent-periwinkle) 55%, var(--accent-mint) 100%);
+  background-size: 220% 220%;
+  animation: ic-grad 9s ease-in-out infinite;
+}
+@keyframes ic-grad {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ---- Solution card motifs (ambient + hover-intensify) --------------------- */
+/* Ambient loops run continuously but calm; on .sm-host:hover they speed up and
+   the "narrative" transitions complete (bars build, modules slide/light). */
+.sm-stage { width: 100%; height: 100%; }
+.sm-stage svg, .sm-glyph svg { width: 100%; height: 100%; display: block; }
+
+.sm-flow { transform-box: fill-box; animation: sm-flow var(--d, 4.5s) linear infinite; animation-delay: var(--delay, 0s); }
+@keyframes sm-flow {
+  0%   { transform: translate(0,0); opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translate(var(--dx, 240px), var(--dy, 0px)); opacity: 0; }
+}
+.sm-pulse { transform-box: fill-box; transform-origin: center; animation: sm-pulse2 var(--d, 2.8s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+@keyframes sm-pulse2 { 0%,100% { transform: scale(0.78); opacity: 0.6; } 50% { transform: scale(1.12); opacity: 1; } }
+.sm-blink { animation: sm-blink var(--d, 2.4s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+@keyframes sm-blink { 0%,100% { opacity: 0.42; } 50% { opacity: 1; } }
+.sm-draw { stroke-dasharray: var(--len, 160); stroke-dashoffset: var(--len, 160); animation: sm-draw var(--d, 4s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+@keyframes sm-draw { 0% { stroke-dashoffset: var(--len, 160); } 50%,74% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0.3; } }
+.sm-arrow { opacity: 0.85; transition: transform .4s cubic-bezier(.4,0,.2,1); }
+
+/* hover-built narrative: rest at a tasteful base, complete on card hover */
+.sm-bar { transform-box: fill-box; transform-origin: bottom; transform: scaleY(var(--rest, 0.5)); transition: transform .55s cubic-bezier(.4,0,.2,1); transition-delay: var(--delay, 0s); }
+.sm-host:hover .sm-bar { transform: scaleY(1); }
+.sm-seq { opacity: 0.42; transition: opacity .4s ease; transition-delay: var(--delay, 0s); }
+.sm-host:hover .sm-seq { opacity: 1; }
+.sm-slide { transition: transform .5s cubic-bezier(.4,0,.2,1); transition-delay: var(--delay, 0s); transform: translateX(var(--from, 0px)); }
+.sm-host:hover .sm-slide { transform: translateX(0); }
+.sm-cluster { transition: transform .5s cubic-bezier(.4,0,.2,1); }
+.sm-host:hover .sm-cluster { transform: translateX(8px); }
+.sm-host:hover .sm-arrow { transform: translateX(4px); }
+
+/* hover speeds the ambient loops */
+.sm-host:hover .sm-flow  { animation-duration: calc(var(--d, 4.5s) * 0.55); }
+.sm-host:hover .sm-pulse { animation-duration: calc(var(--d, 2.8s) * 0.6); }
+.sm-host:hover .sm-blink { animation-duration: calc(var(--d, 2.4s) * 0.55); }
+.sm-host:hover .sm-draw  { animation-duration: calc(var(--d, 4s) * 0.6); }
+
+/* ---- Solution card typographic header ------------------------------------- */
+/* Thin accent rule under the big mono number: royal-blue line + short crimson
+   segment, that extends to full card width on card hover. */
+.sol-rule { display: flex; height: 2px; width: 56px; overflow: hidden; transition: width .5s cubic-bezier(.4,0,.2,1); }
+.sol-rule .seg-red { flex: 0 0 16px; background: var(--accent-orange); }
+.sol-rule .seg-blue { flex: 1 1 auto; background: var(--accent-magenta); }
+.sm-host:hover .sol-rule { width: 100%; }
+
+/* ---- Technology-partner marquee ------------------------------------------- */
+.ic-marquee-track { animation: ic-marquee 34s linear infinite; }
+.ic-partner img,
+.ic-partner span { filter: grayscale(1); opacity: .55; }
+@keyframes ic-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---- Motif primitive animations ------------------------------------------- */
+.ic-pulse  { animation: ic-pulse 3.2s ease-in-out infinite; }
+.ic-spin   { animation: ic-spin 26s linear infinite; transform-origin: center; }
+.ic-spin-r { animation: ic-spin 34s linear infinite reverse; transform-origin: center; }
+.ic-grow   { animation: ic-grow 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom; }
+.ic-float  { animation: ic-float 6s ease-in-out infinite; }
+.ic-dash   { stroke-dasharray: 6 10; animation: ic-dash 2.6s linear infinite; }
+.ic-orbit  { animation: ic-spin 14s linear infinite; transform-origin: center; }
+
+@keyframes ic-pulse { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
+@keyframes ic-spin  { to { transform: rotate(360deg); } }
+@keyframes ic-grow  { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+@keyframes ic-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes ic-dash  { to { stroke-dashoffset: -160; } }
+
+/* draw-in for stroke paths (set --len via inline style) */
+.ic-draw { stroke-dasharray: var(--len, 400); stroke-dashoffset: var(--len, 400); }
+.ic-reveal.ic-in .ic-draw,
+.ic-in.ic-draw { animation: ic-draw 1.6s cubic-bezier(.2,.6,.2,1) forwards; }
+@keyframes ic-draw { to { stroke-dashoffset: 0; } }
+
+/* ---- Hero / product viz animations ---------------------------------------- */
+/* Comet streak that accelerates along an inline offset-path (logo motif). */
+.ic-streak { offset-rotate: auto; animation: ic-streak 2.8s cubic-bezier(.5,0,.75,1) infinite; }
+@keyframes ic-streak {
+  0%   { offset-distance: 0%;   opacity: 0; }
+  9%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+/* Twinkle spark (logo star). */
+.ic-twinkle { animation: ic-twinkle 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ic-twinkle { 0%,100% { transform: scale(.6) rotate(0deg); opacity: .35; } 50% { transform: scale(1.1) rotate(45deg); opacity: 1; } }
+/* Radar / scanner sweep. */
+.ic-sweep { animation: ic-sweep 7s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ic-sweep { to { transform: rotate(360deg); } }
+/* Edge draw loop (graph links). */
+.ic-trace { stroke-dasharray: var(--len, 120); stroke-dashoffset: var(--len, 120); animation: ic-trace 4s ease-in-out infinite; }
+@keyframes ic-trace { 0% { stroke-dashoffset: var(--len,120); } 45%,70% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+/* Chat bubble rise. */
+.ic-rise { animation: ic-rise 5s ease-in-out infinite; transform-box: fill-box; }
+@keyframes ic-rise { 0% { opacity: 0; transform: translateY(10px) scale(.92); } 14%,72% { opacity: 1; transform: translateY(0) scale(1); } 92%,100% { opacity: 0; transform: translateY(-4px) scale(.98); } }
+/* Slow continuous drift for ambient particles. */
+.ic-drift { animation: ic-float 8s ease-in-out infinite; }
+/* Core breathing glow. */
+.ic-breathe { animation: ic-breathe 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ic-breathe { 0%,100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ic-reveal { opacity: 1; transform: none; transition: none; }
+  .ic-pulse, .ic-spin, .ic-spin-r, .ic-grow, .ic-float, .ic-dash, .ic-orbit,
+  .ic-streak, .ic-twinkle, .ic-sweep, .ic-trace, .ic-rise, .ic-drift, .ic-breathe,
+  .ic-marquee-track,
+  .sm-flow, .sm-pulse, .sm-blink, .sm-draw,
+  .ic-gradient-anim, .ic-gradient-bar { animation: none !important; }
+  .sm-draw { stroke-dashoffset: 0; }
+  .sm-bar { transform: scaleY(0.8); }
+  .sm-seq { opacity: 0.85; }
+  .ic-streak { offset-distance: 60%; opacity: .8; }
+  .ic-trace { stroke-dashoffset: 0; }
+  .ic-rise { opacity: 1; transform: none; }
+}

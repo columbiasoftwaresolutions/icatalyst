@@ -1,0 +1,238 @@
+/* ============================================================================
+   Icatalyst Design System — Foundations
+   colors_and_type.css
+
+   Single source of truth for color + type tokens.
+   Import this file first, then layer component CSS / page CSS on top.
+
+   FONT NOTE: The brand's two proprietary faces are "The Future" (display sans)
+   and "PP Neue Montreal Mono". They are substituted here with Geist + Geist Mono
+   (Google Fonts) — a coherent technical pairing. Swap the @import + --font-*
+   vars when the licensed faces are supplied. See README.md › Typography.
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ---- Font families ------------------------------------------------------ */
+  --font-display: 'Geist', 'Inter', 'Helvetica Neue', Arial, sans-serif;       /* substitute for "The Future" */
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;         /* substitute for "PP Neue Montreal Mono" */
+
+  /* ========================================================================
+     COLOR — base tokens
+     ======================================================================== */
+
+  /* Brand / primary */
+  --primary: #000000;          /* the single black CTA color */
+  --on-primary: #ffffff;
+  --ink: #000000;              /* headings + body on light surfaces */
+
+  /* Surfaces */
+  --canvas: #ffffff;           /* default light band */
+  --canvas-dark: #010120;      /* near-black hero / research band */
+  --surface-dark-soft: #313641;/* lighter dark fill inside dark-band cards */
+  --hairline-on-dark: #26263a; /* 1px dividers + badge bg on dark surfaces */
+  --on-dark: #ffffff;          /* all text on dark surfaces */
+
+  /* Lines + muted */
+  --hairline: #ebebeb;         /* soft surface tone: table headers, toggle rails, 1px dividers */
+  --body: #959494;             /* muted / secondary text + mono eyebrows on light */
+
+  /* ---- Brand accents — disciplined blue scale + ONE warm accent ---------- */
+  /* Palette is blue / white / black. The single non-blue accent is a crimson
+     drawn from the iCatalyst logo's spark — used sparingly for emphasis only. */
+  --accent-orange: #b4384a;        /* THE accent — logo crimson (sparks, key points, active) */
+  --accent-magenta: #2a52c9;       /* royal blue — primary highlight / link / gradient */
+  --accent-periwinkle: #c2d2f5;    /* light blue — strokes, rings, tile bg */
+  --accent-mint: #dde8fb;          /* pale blue — secondary pills + stat tiles */
+
+  /* The signature ribbon — now a calm blue ramp (no crimson). Hero scale only. */
+  --brand-gradient: linear-gradient(
+      100deg,
+      var(--accent-magenta) 0%,
+      var(--accent-periwinkle) 55%,
+      var(--accent-mint) 100%);
+
+  /* Translucent hairlines (for layering on either surface) */
+  --hairline-translucent: rgba(0, 0, 0, 0.08);
+  --hairline-on-dark-translucent: rgba(255, 255, 255, 0.12);
+
+  /* ========================================================================
+     SPACING — 4px base
+     ======================================================================== */
+  --space-xxs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 44px;
+  --space-5xl: 48px;
+  --space-6xl: 55.2px;
+  --space-section: 80px;       /* marketing band top/bottom rhythm */
+
+  /* ========================================================================
+     RADIUS
+     ======================================================================== */
+  --radius-none: 0px;
+  --radius-xs: 3.25px;         /* pricing sub-tabs + outline button */
+  --radius-sm: 4px;            /* canonical: buttons, cards, badges, table rows */
+  --radius-md: 8px;            /* feature-tab pills, larger pricing-tab containers */
+  --radius-full: 9999px;       /* ONLY the floating chat-launcher orb */
+
+  /* ========================================================================
+     ELEVATION
+     ======================================================================== */
+  --shadow-soft-drop: 0px 4px 10px 0px rgba(1, 1, 32, 0.10); /* floating elements only */
+
+  /* ========================================================================
+     TYPOGRAPHY — token sizes / weights / metrics
+     ======================================================================== */
+  --display-xxl-size: 64px;   --display-xxl-lh: 70.4px; --display-xxl-ls: -1.92px;
+  --display-xl-size: 40px;    --display-xl-lh: 48px;    --display-xl-ls: -0.8px;
+  --display-lg-size: 28px;    --display-lg-lh: 32.2px;  --display-lg-ls: -0.42px;
+  --display-md-size: 22px;    --display-md-lh: 25.3px;  --display-md-ls: -0.22px;
+
+  --body-lg-size: 18px;       --body-lg-lh: 23.4px;     --body-lg-ls: -0.18px;
+  --body-md-size: 16px;       --body-md-lh: 20.8px;     --body-md-ls: -0.16px;
+  --caption-size: 14px;       --caption-lh: 19.6px;     --caption-ls: 0;
+
+  --mono-button-size: 16px;   --mono-button-lh: 16px;   --mono-button-ls: 0.08px;
+  --mono-eyebrow-size: 11px;  --mono-eyebrow-lh: 11px;  --mono-eyebrow-ls: 0.55px;
+  --mono-label-size: 11px;    --mono-label-lh: 15.4px;  --mono-label-ls: 0.055px;
+  --mono-caption-size: 10px;  --mono-caption-lh: 14px;  --mono-caption-ls: 0.05px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+}
+
+/* ============================================================================
+   SEMANTIC TYPE CLASSES
+   Display sans = narrative (sentence case). Mono = technical labels (UPPERCASE).
+   Never let mono carry a paragraph; never let display sans carry a button label.
+   ============================================================================ */
+
+.t-display-xxl {
+  font-family: var(--font-display);
+  font-size: var(--display-xxl-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--display-xxl-lh);
+  letter-spacing: var(--display-xxl-ls);
+}
+.t-display-xl {
+  font-family: var(--font-display);
+  font-size: var(--display-xl-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--display-xl-lh);
+  letter-spacing: var(--display-xl-ls);
+}
+.t-display-lg {
+  font-family: var(--font-display);
+  font-size: var(--display-lg-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--display-lg-lh);
+  letter-spacing: var(--display-lg-ls);
+}
+.t-display-md {
+  font-family: var(--font-display);
+  font-size: var(--display-md-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--display-md-lh);
+  letter-spacing: var(--display-md-ls);
+}
+
+.t-body-lg {
+  font-family: var(--font-display);
+  font-size: var(--body-lg-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--body-lg-lh);
+  letter-spacing: var(--body-lg-ls);
+}
+.t-body-lg-strong {
+  font-family: var(--font-display);
+  font-size: var(--body-lg-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--body-lg-lh);
+  letter-spacing: var(--body-lg-ls);
+}
+.t-body-md {
+  font-family: var(--font-display);
+  font-size: var(--body-md-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--body-md-lh);
+  letter-spacing: var(--body-md-ls);
+}
+.t-body-md-strong {
+  font-family: var(--font-display);
+  font-size: var(--body-md-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--body-md-lh);
+  letter-spacing: var(--body-md-ls);
+}
+.t-caption {
+  font-family: var(--font-display);
+  font-size: var(--caption-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--caption-lh);
+}
+.t-caption-strong {
+  font-family: var(--font-display);
+  font-size: var(--caption-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--caption-lh);
+}
+
+/* ---- Mono faces — always uppercase ---------------------------------------- */
+.t-mono-button {
+  font-family: var(--font-mono);
+  font-size: var(--mono-button-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--mono-button-lh);
+  letter-spacing: var(--mono-button-ls);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.t-mono-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--mono-eyebrow-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--mono-eyebrow-lh);
+  letter-spacing: var(--mono-eyebrow-ls);
+  text-transform: uppercase;
+}
+.t-mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--mono-label-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--mono-label-lh);
+  letter-spacing: var(--mono-label-ls);
+  text-transform: uppercase;
+}
+.t-mono-caption {
+  font-family: var(--font-mono);
+  font-size: var(--mono-caption-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--mono-caption-lh);
+  letter-spacing: var(--mono-caption-ls);
+}
+
+/* ============================================================================
+   ELEMENT DEFAULTS — opt-in base so raw HTML reads on-brand
+   ============================================================================ */
+.ds-scope {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-size: var(--body-md-size);
+  line-height: var(--body-md-lh);
+  letter-spacing: var(--body-md-ls);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.ds-scope h1 { font: var(--weight-medium) var(--display-xxl-size)/var(--display-xxl-lh) var(--font-display); letter-spacing: var(--display-xxl-ls); margin: 0; }
+.ds-scope h2 { font: var(--weight-medium) var(--display-xl-size)/var(--display-xl-lh) var(--font-display); letter-spacing: var(--display-xl-ls); margin: 0; }
+.ds-scope h3 { font: var(--weight-medium) var(--display-lg-size)/var(--display-lg-lh) var(--font-display); letter-spacing: var(--display-lg-ls); margin: 0; }
+.ds-scope h4 { font: var(--weight-medium) var(--display-md-size)/var(--display-md-lh) var(--font-display); letter-spacing: var(--display-md-ls); margin: 0; }
+.ds-scope p  { margin: 0; }
+.ds-scope code { font-family: var(--font-mono); font-size: var(--mono-caption-size); }
