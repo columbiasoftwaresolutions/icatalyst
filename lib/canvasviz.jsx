@@ -29,6 +29,22 @@ function vizPalette() {
 const vrgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 const SCENE_ALIAS = { geo: 'globe', semantic: 'network', assistant: 'accelerate' };
 
+// Real-world country outlines (world-atlas 110m topojson). Loaded once, shared.
+let _countriesPromise = null;
+function loadWorld() {
+  if (_countriesPromise) return _countriesPromise;
+  if (typeof topojson === 'undefined') return Promise.resolve(null);
+  _countriesPromise = fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    .then(r => r.json())
+    .then(topo => ({
+      land: topojson.feature(topo, topo.objects.land),
+      countries: topojson.feature(topo, topo.objects.countries),
+      borders: topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b),
+    }))
+    .catch(() => null);
+  return _countriesPromise;
+}
+
 class VizEngine {
   constructor(canvas, scene, intensity) {
     this.canvas = canvas;
@@ -105,14 +121,6 @@ class VizEngine {
       }));
       this.linkD = Math.min(w, h) * 0.26 + 50;
     } else if (this.scene === 'globe') {
-      // Subtle surface stippling (land freckles) — atmospherics, not the main shape
-      const n = Math.min(360, Math.round(8 + area / 1700 * I));
-      this.pts = [];
-      const gold = Math.PI * (3 - Math.sqrt(5));
-      for (let i = 0; i < n; i++) {
-        const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = gold * i;
-        this.pts.push({ x: Math.cos(th) * r, y, z: Math.sin(th) * r });
-      }
       // Real-world major airport hubs — [code, lat°, lon°]
       const HUBS = [
         ['JFK', 40.6, -73.8], ['LAX', 33.9, -118.4], ['ORD', 42.0, -87.9],
@@ -123,12 +131,11 @@ class VizEngine {
         ['SIN', 1.4, 103.9], ['HKG', 22.3, 113.9], ['ICN', 37.5, 126.4],
         ['NRT', 35.8, 140.4], ['SYD', -33.9, 151.2],
       ];
-      this.airports = HUBS.map(([name, la, lo]) => {
-        const lat = la * Math.PI / 180, lon = lo * Math.PI / 180;
-        return { name, x: Math.cos(lat) * Math.cos(lon), y: Math.sin(lat), z: Math.cos(lat) * Math.sin(lon) };
-      });
+      this.airports = HUBS.map(([name, lat, lon]) => ({ name, lat, lon }));
       this.planes = Array.from({ length: Math.max(3, Math.round(6 * I)) }, () => this._newPlane());
       this.rot = 0;
+      this.world = null;
+      loadWorld().then(w => { this.world = w; });
     } else if (this.scene === 'accelerate') {
       const n = Math.min(260, Math.round(area / 4600 * I) + 30);
       this.cy = h * 0.5;
@@ -148,15 +155,8 @@ class VizEngine {
     const a = (Math.random() * A.length) | 0;
     let b = (Math.random() * A.length) | 0;
     while (b === a) b = (Math.random() * A.length) | 0;
-    const dot = A[a].x * A[b].x + A[a].y * A[b].y + A[a].z * A[b].z;
-    const om = Math.acos(Math.max(-1, Math.min(1, dot))); // great-circle angle
-    return { a, b, p: 0, spd: this.rnd(0.14, 0.28), om };
-  }
-  _slerp(A, B, t, om) {
-    const so = Math.sin(om);
-    if (so < 0.0008) return { x: A.x, y: A.y, z: A.z };
-    const k1 = Math.sin((1 - t) * om) / so, k2 = Math.sin(t * om) / so;
-    return { x: A.x * k1 + B.x * k2, y: A.y * k1 + B.y * k2, z: A.z * k1 + B.z * k2 };
+    const interp = d3.geoInterpolate([A[a].lon, A[a].lat], [A[b].lon, A[b].lat]);
+    return { a, b, p: 0, spd: this.rnd(0.14, 0.28), interp };
   }
   _spawnAcc(spread) {
     // streamline: enters left at random height, exits right as one ordered stream
@@ -255,110 +255,88 @@ class VizEngine {
     } else if (this.scene === 'globe') {
       this.clear(1);
       const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.42;
-      const cosT = Math.cos(0.42), sinT = Math.sin(0.42);
-      const proj = (p) => {
-        const cr = Math.cos(this.rot), sr = Math.sin(this.rot);
-        let X = p.x * cr - p.z * sr, Z = p.x * sr + p.z * cr, Y = p.y;
-        const y2 = Y * cosT - Z * sinT, z2 = Y * sinT + Z * cosT;
-        return { sx: cx + X * R, sy: cy + y2 * R, z: z2 };
-      };
+      const rotDeg = -(this.rot * 180 / Math.PI);
+
+      // d3 orthographic projection — matches our rotation + a fixed 24° tilt
+      const projection = d3.geoOrthographic()
+        .scale(R)
+        .translate([cx, cy])
+        .rotate([rotDeg, -24, 0])
+        .clipAngle(90);
+      const path = d3.geoPath(projection, c);
 
       // Atmosphere halo
       this._glow(cx, cy, R * 1.62, P.royal, 0.16);
-      // Globe disk
-      c.fillStyle = vrgba(P.royal, 0.06);
-      c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.fill();
-      // Limb (sphere edge)
-      c.lineWidth = 1;
-      c.strokeStyle = vrgba(P.light, 0.35);
-      c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.stroke();
 
-      // Graticule: parallels + meridians every 30°
-      c.lineWidth = 0.8;
-      c.strokeStyle = vrgba(P.royal, 0.32);
-      const drawGreatCircle = (sample) => {
-        const steps = 80;
-        c.beginPath();
-        let started = false;
-        for (let k = 0; k <= steps; k++) {
-          const u = (k / steps) * Math.PI * 2;
-          const s = proj(sample(u));
-          if (s.z > -0.02) {
-            if (!started) { c.moveTo(s.sx, s.sy); started = true; }
-            else c.lineTo(s.sx, s.sy);
-          } else { started = false; }
-        }
+      // Ocean / sphere disk
+      c.beginPath(); path({ type: 'Sphere' });
+      c.fillStyle = vrgba(P.royal, 0.10);
+      c.fill();
+
+      // Graticule (lat/lon grid) — drawn under landmass so it shows in oceans
+      c.beginPath(); path(d3.geoGraticule10());
+      c.lineWidth = 0.6;
+      c.strokeStyle = vrgba(P.royal, 0.28);
+      c.stroke();
+
+      // Real country landmasses
+      if (this.world) {
+        // Filled land
+        c.beginPath(); path(this.world.land);
+        c.fillStyle = vrgba(P.royal, 0.55);
+        c.fill();
+        c.lineWidth = 0.8;
+        c.strokeStyle = vrgba(P.light, 0.55);
         c.stroke();
-      };
-      // Parallels (latitude rings) at -60, -30, 0, 30, 60
-      for (let m = -2; m <= 2; m++) {
-        const phi = m * Math.PI / 6;
-        const yC = Math.sin(phi), rC = Math.cos(phi);
-        drawGreatCircle(u => ({ x: Math.cos(u) * rC, y: yC, z: Math.sin(u) * rC }));
-      }
-      // Meridians (longitude rings) every 30°
-      for (let m = 0; m < 6; m++) {
-        const phi = m * Math.PI / 6;
-        const cP = Math.cos(phi), sP = Math.sin(phi);
-        drawGreatCircle(u => ({ x: Math.cos(u) * cP, y: Math.sin(u), z: Math.cos(u) * sP }));
+        // Country borders (lighter)
+        c.beginPath(); path(this.world.borders);
+        c.lineWidth = 0.5;
+        c.strokeStyle = vrgba(P.light, 0.35);
+        c.stroke();
       }
 
-      // Surface land freckles (front side only)
-      for (const p of this.pts) {
-        const s = proj(p);
-        if (s.z < 0.02) continue;
-        const depth = (s.z + 1) / 2;
-        c.fillStyle = vrgba(P.light, 0.16 + depth * 0.24);
-        c.beginPath(); c.arc(s.sx, s.sy, 0.5 + depth * 0.9, 0, 6.2832); c.fill();
-      }
+      // Limb (sphere edge highlight)
+      c.beginPath(); path({ type: 'Sphere' });
+      c.lineWidth = 1;
+      c.strokeStyle = vrgba(P.light, 0.45);
+      c.stroke();
 
-      // Airport markers
+      // Airport markers — only those on the visible hemisphere
       for (const ap of this.airports) {
-        const s = proj(ap);
-        if (s.z < 0.04) continue;
-        const depth = (s.z + 1) / 2;
-        c.fillStyle = vrgba(P.white, 0.12 + depth * 0.1);
-        c.beginPath(); c.arc(s.sx, s.sy, 4.5, 0, 6.2832); c.fill();
-        c.fillStyle = vrgba(P.white, 0.55 + depth * 0.4);
-        c.beginPath(); c.arc(s.sx, s.sy, 1.9, 0, 6.2832); c.fill();
+        const xy = projection([ap.lon, ap.lat]);
+        if (!xy) continue;
+        c.fillStyle = vrgba(P.white, 0.18);
+        c.beginPath(); c.arc(xy[0], xy[1], 4.5, 0, 6.2832); c.fill();
+        c.fillStyle = vrgba(P.white, 0.95);
+        c.beginPath(); c.arc(xy[0], xy[1], 1.9, 0, 6.2832); c.fill();
       }
 
-      // Plane flights — great-circle arcs with trail + plane head
+      // Plane flights — d3.geoInterpolate gives the great-circle path
       c.lineCap = 'round';
       for (const pl of this.planes) {
-        const A = this.airports[pl.a], B = this.airports[pl.b];
         const tNow = Math.min(1, pl.p);
-        const steps = 32;
+        const steps = 48;
         const endStep = Math.max(1, Math.floor(steps * tNow));
-        // Trail
-        c.lineWidth = 1.4;
-        c.strokeStyle = vrgba(P.accent, 0.6);
+
+        // Trail — clipping at the horizon is handled by projection.clipAngle
+        const coords = [];
+        for (let k = 0; k <= endStep; k++) coords.push(pl.interp(k / steps));
         c.beginPath();
-        let started = false;
-        for (let k = 0; k <= endStep; k++) {
-          const f = k / steps;
-          const pt = this._slerp(A, B, f, pl.om);
-          const lift = 1 + 0.18 * Math.sin(f * Math.PI);
-          const s = proj({ x: pt.x * lift, y: pt.y * lift, z: pt.z * lift });
-          if (s.z < -0.08) { started = false; continue; }
-          if (!started) { c.moveTo(s.sx, s.sy); started = true; }
-          else c.lineTo(s.sx, s.sy);
-        }
+        path({ type: 'LineString', coordinates: coords });
+        c.lineWidth = 1.4;
+        c.strokeStyle = vrgba(P.accent, 0.7);
         c.stroke();
 
-        // Plane head — small triangle aligned to direction of travel
-        const tA = Math.max(0, tNow - 0.014), tB = tNow;
-        const pA = this._slerp(A, B, tA, pl.om);
-        const pB = this._slerp(A, B, tB, pl.om);
-        const lA = 1 + 0.18 * Math.sin(tA * Math.PI);
-        const lB = 1 + 0.18 * Math.sin(tB * Math.PI);
-        const sA = proj({ x: pA.x * lA, y: pA.y * lA, z: pA.z * lA });
-        const sB = proj({ x: pB.x * lB, y: pB.y * lB, z: pB.z * lB });
-        if (sB.z > -0.04) {
-          const ang = Math.atan2(sB.sy - sA.sy, sB.sx - sA.sx);
+        // Plane head — sample two close points to derive heading
+        const headLL = pl.interp(tNow);
+        const backLL = pl.interp(Math.max(0, tNow - 0.014));
+        const head = projection(headLL);
+        const back = projection(backLL);
+        if (head && back) {
+          const ang = Math.atan2(head[1] - back[1], head[0] - back[0]);
           const sz = 3.6;
           c.save();
-          c.translate(sB.sx, sB.sy);
+          c.translate(head[0], head[1]);
           c.rotate(ang);
           c.fillStyle = vrgba(P.white, 0.98);
           c.beginPath();
