@@ -53,13 +53,13 @@ function HomeHero({ t }) {
 
   if (layout === 'fullbleed') {
     return (
-      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', position: 'relative', overflow: 'hidden', minHeight: 'calc(100vh - 64px)' }} data-screen-label="Hero">
+      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', position: 'relative', overflow: 'hidden', minHeight: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column' }} data-screen-label="Hero">
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           <Viz scene={visual} intensity="bold" />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, var(--canvas-dark) 18%, rgba(1,1,32,0.55) 50%, rgba(1,1,32,0) 80%)' }}></div>
         </div>
-        <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)', position: 'relative' }}>
-          <div style={{ paddingBottom: 'var(--space-5xl)' }}>
+        <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)', position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
             <ValueRotator items={IC.valueStatements} />
           </div>
           <div style={{ maxWidth: 600 }}>{text}</div>
