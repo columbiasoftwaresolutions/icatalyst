@@ -303,9 +303,18 @@ class VizEngine {
       c.strokeStyle = vrgba(P.light, 0.45);
       c.stroke();
 
-      // Airport markers — only those on the visible hemisphere
+      // Visibility test: d3.geoOrthographic's clipAngle only clips paths,
+      // not raw point projection — so we hand-check each point against the
+      // hemisphere by angular distance from the projection's center.
+      const center = projection.invert([cx, cy]); // [lon°, lat°]
+      const HALF_PI = Math.PI / 2;
+      const visible = (ll) => d3.geoDistance(ll, center) < HALF_PI;
+
+      // Airport markers — disappear cleanly when the city rotates to the back
       for (const ap of this.airports) {
-        const xy = projection([ap.lon, ap.lat]);
+        const ll = [ap.lon, ap.lat];
+        if (!visible(ll)) continue;
+        const xy = projection(ll);
         if (!xy) continue;
         c.fillStyle = vrgba(P.white, 0.18);
         c.beginPath(); c.arc(xy[0], xy[1], 4.5, 0, 6.2832); c.fill();
@@ -334,7 +343,7 @@ class VizEngine {
         const backLL = pl.interp(Math.max(0, tNow - 0.014));
         const head = projection(headLL);
         const back = projection(backLL);
-        if (head && back) {
+        if (head && back && visible(headLL)) {
           const ang = Math.atan2(head[1] - back[1], head[0] - back[0]);
           const sz = 3.6;
           c.save();
