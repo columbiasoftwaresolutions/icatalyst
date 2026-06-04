@@ -190,7 +190,9 @@ class VizEngine {
         nd.x = Math.max(0, Math.min(w, nd.x)); nd.y = Math.max(0, Math.min(h, nd.y));
       }
     } else if (this.scene === 'globe') {
-      // Globe is fixed — cities are stationary. Planes still fly.
+      // Earth spins; city pins ride along (pinned to lat/lon).
+      // Only planes move relative to the globe.
+      this.rot += dt * 0.18 * I;
       for (const pl of this.planes) {
         pl.p += dt * pl.spd;
         if (pl.p >= 1.05) Object.assign(pl, this._newPlane());
