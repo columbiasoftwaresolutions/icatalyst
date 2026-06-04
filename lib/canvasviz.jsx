@@ -157,7 +157,7 @@ class VizEngine {
         ['AKL', -37.0, 174.8], ['NAN', -17.8, 177.4],
       ];
       this.airports = HUBS.map(([name, lat, lon]) => ({ name, lat, lon }));
-      this.planes = Array.from({ length: Math.max(8, Math.round(18 * I)) }, () => this._newPlane());
+      this.planes = Array.from({ length: Math.max(14, Math.round(32 * I)) }, () => this._newPlane());
       this.rot = 0;
       this.world = null;
       loadWorld().then(w => { this.world = w; });
@@ -370,16 +370,33 @@ class VizEngine {
         const back = projection(backLL);
         if (head && back && visible(headLL)) {
           const ang = Math.atan2(head[1] - back[1], head[0] - back[0]);
-          const sz = 3.6;
+          const sz = 5;
           c.save();
           c.translate(head[0], head[1]);
           c.rotate(ang);
           c.fillStyle = vrgba(P.white, 0.98);
+          // Top-down airliner silhouette: nose, swept wings, tail stabilizers
           c.beginPath();
-          c.moveTo(sz, 0);
-          c.lineTo(-sz * 0.75, sz * 0.62);
-          c.lineTo(-sz * 0.45, 0);
-          c.lineTo(-sz * 0.75, -sz * 0.62);
+          c.moveTo( sz * 1.20,  0);             // nose tip
+          c.lineTo( sz * 0.70,  sz * 0.13);     // forward fuselage R
+          c.lineTo( sz * 0.15,  sz * 0.17);     // wing root front R
+          c.lineTo(-sz * 0.35,  sz * 1.00);     // wing tip front R
+          c.lineTo(-sz * 0.50,  sz * 1.00);     // wing tip back R
+          c.lineTo(-sz * 0.20,  sz * 0.20);     // wing root back R
+          c.lineTo(-sz * 0.75,  sz * 0.14);     // mid-fuselage R
+          c.lineTo(-sz * 0.95,  sz * 0.42);     // tail wing tip front R
+          c.lineTo(-sz * 1.05,  sz * 0.42);     // tail wing tip back R
+          c.lineTo(-sz * 0.92,  sz * 0.12);     // tail wing root R
+          c.lineTo(-sz * 1.15,  0);             // tail
+          c.lineTo(-sz * 0.92, -sz * 0.12);
+          c.lineTo(-sz * 1.05, -sz * 0.42);
+          c.lineTo(-sz * 0.95, -sz * 0.42);
+          c.lineTo(-sz * 0.75, -sz * 0.14);
+          c.lineTo(-sz * 0.20, -sz * 0.20);
+          c.lineTo(-sz * 0.50, -sz * 1.00);
+          c.lineTo(-sz * 0.35, -sz * 1.00);
+          c.lineTo( sz * 0.15, -sz * 0.17);
+          c.lineTo( sz * 0.70, -sz * 0.13);
           c.closePath();
           c.fill();
           c.restore();
