@@ -58,11 +58,11 @@ function HomeHero({ t }) {
           <Viz scene={visual} intensity="bold" />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, var(--canvas-dark) 18%, rgba(1,1,32,0.55) 50%, rgba(1,1,32,0) 80%)' }}></div>
         </div>
-        <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)', position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)', position: 'relative', flex: 1, display: 'grid', gridTemplateRows: 'auto 1fr', justifyItems: 'start' }}>
           <div>
             <ValueRotator items={IC.valueStatements} />
           </div>
-          <div style={{ maxWidth: 600, width: '100%' }}>{text}</div>
+          <div style={{ maxWidth: 600, alignSelf: 'end' }}>{text}</div>
         </Container>
       </section>);
 
