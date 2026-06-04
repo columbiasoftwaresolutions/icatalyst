@@ -37,7 +37,7 @@ function HomeHero({ t }) {
 
   if (centered) {
     return (
-      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', minHeight: 'calc(100vh - 200px)' }} data-screen-label="Hero">
+      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', minHeight: 'calc(100vh - 160px)' }} data-screen-label="Hero">
         <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)', textAlign: 'center' }}>
           <div style={{ paddingBottom: 'var(--space-4xl)', display: 'flex', justifyContent: 'center' }}>
             <ValueRotator items={IC.valueStatements} />
@@ -53,7 +53,7 @@ function HomeHero({ t }) {
 
   if (layout === 'fullbleed') {
     return (
-      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', position: 'relative', overflow: 'hidden', minHeight: 'calc(100vh - 200px)' }} data-screen-label="Hero">
+      <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', position: 'relative', overflow: 'hidden', minHeight: 'calc(100vh - 160px)' }} data-screen-label="Hero">
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           <Viz scene={visual} intensity="bold" />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, var(--canvas-dark) 18%, rgba(1,1,32,0.55) 50%, rgba(1,1,32,0) 80%)' }}></div>
@@ -70,7 +70,7 @@ function HomeHero({ t }) {
 
   /* split (default) */
   return (
-    <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', minHeight: 'calc(100vh - 200px)' }} data-screen-label="Hero">
+    <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', minHeight: 'calc(100vh - 160px)' }} data-screen-label="Hero">
       <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)' }}>
         <div style={{ paddingBottom: 'var(--space-5xl)' }}>
           <ValueRotator items={IC.valueStatements} />
@@ -105,7 +105,7 @@ function PartnerBar() {
   const items = IC.partnerLogos;
   return (
     <section style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--hairline)' }}>
-      <div style={{ paddingTop: 'var(--space-3xl)' }}>
+      <div style={{ paddingTop: 'var(--space-lg)' }}>
         <div className="ic-marquee" style={{ position: 'relative', overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)', maskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)' }}>
           <div className="ic-marquee-track" style={{ display: 'flex', alignItems: 'center', width: 'max-content' }}>
             {items.map((p) => <PartnerLogo key={p.id} p={p} />)}
