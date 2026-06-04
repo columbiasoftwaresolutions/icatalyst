@@ -105,14 +105,29 @@ class VizEngine {
       }));
       this.linkD = Math.min(w, h) * 0.26 + 50;
     } else if (this.scene === 'globe') {
-      const n = Math.min(680, Math.round(8 + area / 760 * I));
+      // Subtle surface stippling (land freckles) — atmospherics, not the main shape
+      const n = Math.min(360, Math.round(8 + area / 1700 * I));
       this.pts = [];
       const gold = Math.PI * (3 - Math.sqrt(5));
       for (let i = 0; i < n; i++) {
         const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = gold * i;
-        this.pts.push({ x: Math.cos(th) * r, y, z: Math.sin(th) * r, accent: Math.random() < 0.05 });
+        this.pts.push({ x: Math.cos(th) * r, y, z: Math.sin(th) * r });
       }
-      this.arcs = Array.from({ length: Math.round(3 * I) + 2 }, () => this._newArc());
+      // Real-world major airport hubs — [code, lat°, lon°]
+      const HUBS = [
+        ['JFK', 40.6, -73.8], ['LAX', 33.9, -118.4], ['ORD', 42.0, -87.9],
+        ['YYZ', 43.7, -79.6], ['MEX', 19.4, -99.1], ['GRU', -23.4, -46.5],
+        ['LHR', 51.5, -0.5], ['CDG', 49.0, 2.5], ['FRA', 50.0, 8.6],
+        ['AMS', 52.3, 4.8], ['IST', 41.0, 28.8], ['DXB', 25.3, 55.4],
+        ['JNB', -26.1, 28.2], ['BOM', 19.1, 72.9], ['DEL', 28.6, 77.1],
+        ['SIN', 1.4, 103.9], ['HKG', 22.3, 113.9], ['ICN', 37.5, 126.4],
+        ['NRT', 35.8, 140.4], ['SYD', -33.9, 151.2],
+      ];
+      this.airports = HUBS.map(([name, la, lo]) => {
+        const lat = la * Math.PI / 180, lon = lo * Math.PI / 180;
+        return { name, x: Math.cos(lat) * Math.cos(lon), y: Math.sin(lat), z: Math.cos(lat) * Math.sin(lon) };
+      });
+      this.planes = Array.from({ length: Math.max(3, Math.round(6 * I)) }, () => this._newPlane());
       this.rot = 0;
     } else if (this.scene === 'accelerate') {
       const n = Math.min(260, Math.round(area / 4600 * I) + 30);
@@ -128,6 +143,21 @@ class VizEngine {
     return { x: Math.random() * this.w, y: Math.random() * this.h, px: 0, py: 0, life: this.rnd(0, 200), col, accent: r < 0.05 };
   }
   _newArc() { const a = (Math.random() * this.pts.length) | 0, b = (Math.random() * this.pts.length) | 0; return { a, b, p: Math.random(), spd: this.rnd(0.25, 0.6) }; }
+  _newPlane() {
+    const A = this.airports;
+    const a = (Math.random() * A.length) | 0;
+    let b = (Math.random() * A.length) | 0;
+    while (b === a) b = (Math.random() * A.length) | 0;
+    const dot = A[a].x * A[b].x + A[a].y * A[b].y + A[a].z * A[b].z;
+    const om = Math.acos(Math.max(-1, Math.min(1, dot))); // great-circle angle
+    return { a, b, p: 0, spd: this.rnd(0.14, 0.28), om };
+  }
+  _slerp(A, B, t, om) {
+    const so = Math.sin(om);
+    if (so < 0.0008) return { x: A.x, y: A.y, z: A.z };
+    const k1 = Math.sin((1 - t) * om) / so, k2 = Math.sin(t * om) / so;
+    return { x: A.x * k1 + B.x * k2, y: A.y * k1 + B.y * k2, z: A.z * k1 + B.z * k2 };
+  }
   _spawnAcc(spread) {
     // streamline: enters left at random height, exits right as one ordered stream
     const w = this.w, h = this.h;
@@ -160,8 +190,11 @@ class VizEngine {
         nd.x = Math.max(0, Math.min(w, nd.x)); nd.y = Math.max(0, Math.min(h, nd.y));
       }
     } else if (this.scene === 'globe') {
-      this.rot += dt * 0.32 * I;
-      for (const ar of this.arcs) { ar.p += dt * ar.spd; if (ar.p > 1.6) Object.assign(ar, this._newArc()); }
+      this.rot += dt * 0.18 * I;
+      for (const pl of this.planes) {
+        pl.p += dt * pl.spd;
+        if (pl.p >= 1.05) Object.assign(pl, this._newPlane());
+      }
     } else if (this.scene === 'accelerate') {
       const cy = this.cy, mid = this.mid;
       for (const p of this.parts) {
@@ -229,29 +262,114 @@ class VizEngine {
         const y2 = Y * cosT - Z * sinT, z2 = Y * sinT + Z * cosT;
         return { sx: cx + X * R, sy: cy + y2 * R, z: z2 };
       };
-      this._glow(cx, cy, R * 1.5, P.royal, 0.12);
-      for (const p of this.pts) {
-        const s = proj(p), depth = (s.z + 1) / 2;
-        const col = p.accent ? P.accent : (depth > 0.6 ? P.white : P.royal);
-        c.fillStyle = vrgba(col, 0.15 + depth * 0.8);
-        const r = 0.6 + depth * 2;
-        c.beginPath(); c.arc(s.sx, s.sy, r, 0, 6.2832); c.fill();
-      }
-      for (const ar of this.arcs) {
-        const A = this.pts[ar.a], B = this.pts[ar.b];
-        const tt = Math.max(0, Math.min(1, ar.p));
-        c.lineWidth = 1.4; c.strokeStyle = vrgba(P.accent, 0.55 * (1 - Math.abs(tt - 0.5) * 1.2));
+
+      // Atmosphere halo
+      this._glow(cx, cy, R * 1.62, P.royal, 0.16);
+      // Globe disk
+      c.fillStyle = vrgba(P.royal, 0.06);
+      c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.fill();
+      // Limb (sphere edge)
+      c.lineWidth = 1;
+      c.strokeStyle = vrgba(P.light, 0.35);
+      c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.stroke();
+
+      // Graticule: parallels + meridians every 30°
+      c.lineWidth = 0.8;
+      c.strokeStyle = vrgba(P.royal, 0.32);
+      const drawGreatCircle = (sample) => {
+        const steps = 80;
         c.beginPath();
-        const steps = 18;
-        for (let k = 0; k <= steps * tt; k++) {
-          const f = k / steps;
-          let x = A.x + (B.x - A.x) * f, y = A.y + (B.y - A.y) * f, z = A.z + (B.z - A.z) * f;
-          const m = Math.hypot(x, y, z) || 1; const lift = 1 + 0.22 * Math.sin(f * Math.PI);
-          x = x / m * lift; y = y / m * lift; z = z / m * lift;
-          const s = proj({ x, y, z });
-          if (k === 0) c.moveTo(s.sx, s.sy); else c.lineTo(s.sx, s.sy);
+        let started = false;
+        for (let k = 0; k <= steps; k++) {
+          const u = (k / steps) * Math.PI * 2;
+          const s = proj(sample(u));
+          if (s.z > -0.02) {
+            if (!started) { c.moveTo(s.sx, s.sy); started = true; }
+            else c.lineTo(s.sx, s.sy);
+          } else { started = false; }
         }
         c.stroke();
+      };
+      // Parallels (latitude rings) at -60, -30, 0, 30, 60
+      for (let m = -2; m <= 2; m++) {
+        const phi = m * Math.PI / 6;
+        const yC = Math.sin(phi), rC = Math.cos(phi);
+        drawGreatCircle(u => ({ x: Math.cos(u) * rC, y: yC, z: Math.sin(u) * rC }));
+      }
+      // Meridians (longitude rings) every 30°
+      for (let m = 0; m < 6; m++) {
+        const phi = m * Math.PI / 6;
+        const cP = Math.cos(phi), sP = Math.sin(phi);
+        drawGreatCircle(u => ({ x: Math.cos(u) * cP, y: Math.sin(u), z: Math.cos(u) * sP }));
+      }
+
+      // Surface land freckles (front side only)
+      for (const p of this.pts) {
+        const s = proj(p);
+        if (s.z < 0.02) continue;
+        const depth = (s.z + 1) / 2;
+        c.fillStyle = vrgba(P.light, 0.16 + depth * 0.24);
+        c.beginPath(); c.arc(s.sx, s.sy, 0.5 + depth * 0.9, 0, 6.2832); c.fill();
+      }
+
+      // Airport markers
+      for (const ap of this.airports) {
+        const s = proj(ap);
+        if (s.z < 0.04) continue;
+        const depth = (s.z + 1) / 2;
+        c.fillStyle = vrgba(P.white, 0.12 + depth * 0.1);
+        c.beginPath(); c.arc(s.sx, s.sy, 4.5, 0, 6.2832); c.fill();
+        c.fillStyle = vrgba(P.white, 0.55 + depth * 0.4);
+        c.beginPath(); c.arc(s.sx, s.sy, 1.9, 0, 6.2832); c.fill();
+      }
+
+      // Plane flights — great-circle arcs with trail + plane head
+      c.lineCap = 'round';
+      for (const pl of this.planes) {
+        const A = this.airports[pl.a], B = this.airports[pl.b];
+        const tNow = Math.min(1, pl.p);
+        const steps = 32;
+        const endStep = Math.max(1, Math.floor(steps * tNow));
+        // Trail
+        c.lineWidth = 1.4;
+        c.strokeStyle = vrgba(P.accent, 0.6);
+        c.beginPath();
+        let started = false;
+        for (let k = 0; k <= endStep; k++) {
+          const f = k / steps;
+          const pt = this._slerp(A, B, f, pl.om);
+          const lift = 1 + 0.18 * Math.sin(f * Math.PI);
+          const s = proj({ x: pt.x * lift, y: pt.y * lift, z: pt.z * lift });
+          if (s.z < -0.08) { started = false; continue; }
+          if (!started) { c.moveTo(s.sx, s.sy); started = true; }
+          else c.lineTo(s.sx, s.sy);
+        }
+        c.stroke();
+
+        // Plane head — small triangle aligned to direction of travel
+        const tA = Math.max(0, tNow - 0.014), tB = tNow;
+        const pA = this._slerp(A, B, tA, pl.om);
+        const pB = this._slerp(A, B, tB, pl.om);
+        const lA = 1 + 0.18 * Math.sin(tA * Math.PI);
+        const lB = 1 + 0.18 * Math.sin(tB * Math.PI);
+        const sA = proj({ x: pA.x * lA, y: pA.y * lA, z: pA.z * lA });
+        const sB = proj({ x: pB.x * lB, y: pB.y * lB, z: pB.z * lB });
+        if (sB.z > -0.04) {
+          const ang = Math.atan2(sB.sy - sA.sy, sB.sx - sA.sx);
+          const sz = 3.6;
+          c.save();
+          c.translate(sB.sx, sB.sy);
+          c.rotate(ang);
+          c.fillStyle = vrgba(P.white, 0.98);
+          c.beginPath();
+          c.moveTo(sz, 0);
+          c.lineTo(-sz * 0.75, sz * 0.62);
+          c.lineTo(-sz * 0.45, 0);
+          c.lineTo(-sz * 0.75, -sz * 0.62);
+          c.closePath();
+          c.fill();
+          c.restore();
+        }
       }
     } else if (this.scene === 'accelerate') {
       this.clear(0.14);
