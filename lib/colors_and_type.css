@@ -109,6 +109,29 @@
 }
 
 /* ============================================================================
+   MOBILE — token overrides for phones (≤720px).
+   Scales spacing + display type down so layouts breathe on small screens.
+   Desktop above 720px is untouched.
+   ============================================================================ */
+@media (max-width: 720px) {
+  :root {
+    /* Tighter spatial rhythm */
+    --space-3xl: 20px;         /* container side padding */
+    --space-4xl: 28px;
+    --space-5xl: 32px;
+    --space-section: 56px;     /* marketing band top/bottom */
+
+    /* Display type scaled down so headlines don't blow out narrow viewports */
+    --display-xxl-size: 40px;  --display-xxl-lh: 44px;  --display-xxl-ls: -1.2px;
+    --display-xl-size: 28px;   --display-xl-lh: 32px;   --display-xl-ls: -0.56px;
+    --display-lg-size: 22px;   --display-lg-lh: 26px;   --display-lg-ls: -0.33px;
+    --display-md-size: 19px;   --display-md-lh: 24px;
+
+    --body-lg-size: 17px;      --body-lg-lh: 22px;
+  }
+}
+
+/* ============================================================================
    SEMANTIC TYPE CLASSES
    Display sans = narrative (sentence case). Mono = technical labels (UPPERCASE).
    Never let mono carry a paragraph; never let display sans carry a button label.

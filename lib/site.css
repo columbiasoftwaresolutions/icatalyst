@@ -136,6 +136,39 @@
 .ic-breathe { animation: ic-breathe 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes ic-breathe { 0%,100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
 
+/* ============================================================================
+   MOBILE — component-level tweaks (≤720px). Token scaling is in
+   colors_and_type.css; below are component overrides that need inline-style
+   precedence or target specific selectors.
+   ============================================================================ */
+@media (max-width: 720px) {
+  /* Hero — use svh so iOS address bar collapse doesn't whiplash the layout.
+     Reserved chrome shrinks too: 56px nav + ~52px visible partner strip. */
+  section[data-screen-label="Hero"] {
+    min-height: calc(100svh - 108px) !important;
+  }
+
+  /* Fullbleed hero gradient: replace the desktop left→right fade with a
+     bottom-darkening wash so the globe stays visible but the text band at
+     the top of the section is still legible on narrow screens. */
+  section[data-screen-label="Hero"] > div:first-child > div {
+    background: linear-gradient(180deg,
+      rgba(1,1,32,0.78) 0%,
+      rgba(1,1,32,0.55) 35%,
+      rgba(1,1,32,0)    70%) !important;
+  }
+
+  /* Partner marquee — tighter logo gaps + smaller logos, snappier scroll */
+  .ic-partner { padding: 0 var(--space-xl) !important; height: 56px !important; }
+  .ic-partner img { height: 24px !important; }
+  .ic-marquee-track { animation-duration: 22s; }
+
+  /* Hero text — slightly cap the headline width to avoid line break on `AI-` */
+  section[data-screen-label="Hero"] h1.t-display-xxl {
+    max-width: 100% !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ic-reveal { opacity: 1; transform: none; transition: none; }
   .ic-pulse, .ic-spin, .ic-spin-r, .ic-grow, .ic-float, .ic-dash, .ic-orbit,
