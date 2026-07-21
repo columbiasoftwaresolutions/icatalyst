@@ -35,12 +35,16 @@ function Eyebrow({ children, dark, style }) {
   );
 }
 
-/* Section header: eyebrow + headline + optional lead. */
-function SectionHead({ eyebrow, title, lead, dark, align = 'left', max = 620 }) {
+/* Section header: eyebrow + headline + optional lead. The headline types out
+   the first time it scrolls into view (set type={false} to opt out). */
+function SectionHead({ eyebrow, title, lead, dark, align = 'left', max = 620, type = true }) {
+  const headStyle = { color: dark ? 'var(--on-dark)' : 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: align === 'center' ? 'none' : max };
   return (
     <div style={{ textAlign: align, marginLeft: align === 'center' ? 'auto' : 0, marginRight: align === 'center' ? 'auto' : 0, maxWidth: align === 'center' ? max : 'none' }}>
       {eyebrow && <Eyebrow dark={dark}>{eyebrow}</Eyebrow>}
-      <h2 className="t-display-xl" style={{ color: dark ? 'var(--on-dark)' : 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: align === 'center' ? 'none' : max }}>{title}</h2>
+      {type
+        ? <TypeOut as="h2" className="t-display-xl" style={headStyle} text={title} loop={false} caretColor={dark ? 'var(--accent-periwinkle)' : 'var(--accent-magenta)'} />
+        : <h2 className="t-display-xl" style={headStyle}>{title}</h2>}
       {lead && <p className="t-body-lg" style={{ color: dark ? '#b9bcce' : 'var(--body)', marginTop: 'var(--space-lg)', maxWidth: align === 'center' ? 'none' : max }}>{lead}</p>}
     </div>
   );
@@ -219,6 +223,43 @@ function Accordion({ label, children, dark, defaultOpen = false, meta }) {
   );
 }
 
+/* Modal / popup — dark card over a dimmed, blurred backdrop. Closes on
+   overlay click, the × button, or Escape. Locks body scroll while open. */
+function Modal({ open, onClose, eyebrow, title, children, maxWidth = 760 }) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) window.lucide.createIcons();
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
+  }, [open]);
+  if (!open) return null;
+  return (
+    <div className="ic-modal-overlay" onClick={onClose} style={{
+      position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(1,1,32,0.66)',
+      backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)',
+      display: 'grid', placeItems: 'center', padding: 'var(--space-3xl)',
+    }}>
+      <div className="ic-modal-card" onClick={e => e.stopPropagation()} style={{
+        position: 'relative', background: 'var(--canvas-dark)', border: '1px solid var(--hairline-on-dark)',
+        borderRadius: 'var(--radius-sm)', maxWidth, width: '100%', maxHeight: '86vh', overflowY: 'auto',
+        padding: 'var(--space-5xl)', boxSizing: 'border-box',
+      }}>
+        <button onClick={onClose} aria-label="Close" style={{
+          position: 'absolute', top: 'var(--space-2xl)', right: 'var(--space-2xl)', border: 0, cursor: 'pointer',
+          background: 'var(--surface-dark-soft)', color: 'var(--on-dark)', width: 36, height: 36,
+          borderRadius: 'var(--radius-sm)', display: 'grid', placeItems: 'center',
+        }}><i data-lucide="x" style={{ width: 18, height: 18 }}></i></button>
+        {eyebrow && <Eyebrow dark>{eyebrow}</Eyebrow>}
+        {title && <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', maxWidth: 560 }}>{title}</h2>}
+        <div style={{ marginTop: 'var(--space-2xl)' }}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
 /* Re-render lucide icons after React paints. Call in each App effect. */
 function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
 
@@ -237,7 +278,7 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
         </div>
       )}
       {eyebrow && <Eyebrow dark>{eyebrow}</Eyebrow>}
-      <h1 className="t-display-xl" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-lg)', maxWidth: 760 }}>{title}</h1>
+      <TypeOut as="h1" className="t-display-xl" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-lg)', maxWidth: 760 }} text={title} loop={false} onView={false} caretColor="var(--accent-periwinkle)" />
       {lead && <p className="t-body-lg" style={{ color: '#b9bcce', marginTop: 'var(--space-2xl)', maxWidth: 640 }}>{lead}</p>}
       {children}
     </div>
@@ -263,5 +304,5 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
 
 Object.assign(window, {
   Container, Band, Eyebrow, SectionHead, Pill, ArrowLink, Tag, PlaceholderBlock,
-  StatTiles, Card, SpecBadge, ValueRotator, Accordion, refreshIcons, PageHeader,
+  StatTiles, Card, SpecBadge, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
 });

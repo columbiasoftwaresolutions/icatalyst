@@ -43,9 +43,10 @@ IC.whoWeAre = [
 ];
 
 IC.metrics = [
-  { n: '2007', l: 'BUILDING SINCE · 17+ YEARS' },
-  { n: '90%+', l: 'EMPLOYEE RETENTION · 5 YRS' },
+  { n: '2007', l: 'FOUNDED · 19+ YEARS OF DELIVERY' },
+  { n: '90%+', l: 'EMPLOYEE RETENTION · PAST 5 YEARS' },
   { n: '4', l: 'FEDERAL CONTRACT VEHICLES' },
+  { n: '3', l: 'ISO & CMMI CERTIFICATIONS' },
 ];
 
 IC.philosophy = {

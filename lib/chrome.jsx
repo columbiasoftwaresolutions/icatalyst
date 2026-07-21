@@ -120,14 +120,35 @@ function Footer() {
           ))}
         </div>
 
-        {/* Certifications + bottom bar */}
+        {/* Certifications — badge marks */}
+        <div style={{ marginTop: 'var(--space-5xl)', paddingTop: 'var(--space-3xl)', borderTop: '1px solid var(--hairline)' }}>
+          <Eyebrow>CERTIFICATIONS &amp; APPRAISALS</Eyebrow>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-lg)', marginTop: 'var(--space-lg)' }}>
+            {IC.certifications.map(c => (
+              <div key={c.code} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-md)',
+                border: '1px solid var(--hairline)', borderRadius: 'var(--radius-sm)',
+                padding: 'var(--space-md) var(--space-lg)', background: 'var(--canvas)',
+              }}>
+                <span style={{
+                  width: 34, height: 34, borderRadius: 'var(--radius-xs)', flexShrink: 0,
+                  background: 'var(--accent-mint)', color: 'var(--accent-magenta)',
+                  display: 'grid', placeItems: 'center',
+                }}><i data-lucide="badge-check" style={{ width: 18, height: 18 }}></i></span>
+                <span style={{ display: 'grid', gap: 2 }}>
+                  <span className="t-mono-label" style={{ color: 'var(--ink)' }}>{c.code}</span>
+                  <span className="t-mono-caption" style={{ color: 'var(--body)' }}>{c.name}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom bar */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-2xl)', marginTop: 'var(--space-3xl)', paddingTop: 'var(--space-3xl)', borderTop: '1px solid var(--hairline)' }}>
-          <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2xl)' }}>
-            {IC.certifications.map(c => <span key={c.code} className="t-mono-label" style={{ color: 'var(--body)' }}>{c.code}</span>)}
-          </span>
+          <span className="t-caption" style={{ color: 'var(--body)' }}>{IC.company.copyright}</span>
           <span style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-2xl)', alignItems: 'center' }}>
             <a href="#" className="t-caption" style={{ color: 'var(--body)', textDecoration: 'none' }}>Privacy Policy</a>
-            <span className="t-caption" style={{ color: 'var(--body)' }}>{IC.company.copyright}</span>
           </span>
         </div>
       </Container>

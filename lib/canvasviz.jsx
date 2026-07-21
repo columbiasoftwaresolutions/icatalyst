@@ -150,7 +150,7 @@ class VizEngine {
         ['SYD', -33.9, 151.2], ['MEL', -37.7, 144.8], ['AKL', -37.0, 174.8],
       ];
       this.airports = HUBS.map(([name, lat, lon]) => ({ name, lat, lon }));
-      this.planes = Array.from({ length: Math.max(10, Math.round(22 * I)) }, () => this._newPlane());
+      this.planes = Array.from({ length: Math.max(18, Math.round(38 * I)) }, () => this._newPlane());
       this.rot = 0;
       this.world = null;
       loadWorld().then(w => { this.world = w; });

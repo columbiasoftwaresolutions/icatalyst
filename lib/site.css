@@ -11,6 +11,11 @@
   will-change: opacity, transform;
 }
 .ic-reveal.ic-in { opacity: 1; transform: none; }
+/* directional reveal variants (add alongside .ic-reveal) */
+.ic-reveal.from-right { transform: translateX(44px); }
+.ic-reveal.from-left  { transform: translateX(-44px); }
+.ic-reveal.from-right.ic-in,
+.ic-reveal.from-left.ic-in { transform: none; }
 
 /* ---- Hover lift (cards / tiles) ------------------------------------------- */
 .ic-lift { transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
@@ -81,6 +86,7 @@
 .sol-rule .seg-red { flex: 0 0 16px; background: var(--accent-orange); }
 .sol-rule .seg-blue { flex: 1 1 auto; background: var(--accent-magenta); }
 .sm-host:hover .sol-rule { width: 100%; }
+.sm-host:hover .sol-arrow { transform: translate(2px,-2px); color: var(--accent-magenta); }
 
 /* ---- Technology-partner marquee ------------------------------------------- */
 .ic-marquee-track { animation: ic-marquee 34s linear infinite; }
@@ -135,6 +141,23 @@
 /* Core breathing glow. */
 .ic-breathe { animation: ic-breathe 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes ic-breathe { 0%,100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
+
+/* ---- Type-out caret -------------------------------------------------------- */
+.type-caret {
+  display: inline-block;
+  width: 0.62em;
+  margin-left: 0.04em;
+  border-right: 0.08em solid currentColor;
+  transform: translateY(0.02em);
+  animation: type-blink 1.05s steps(1) infinite;
+}
+@keyframes type-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* ---- Modal / popup entrance ------------------------------------------------ */
+.ic-modal-overlay { animation: ic-modal-fade .22s ease both; }
+.ic-modal-card { animation: ic-modal-rise .28s cubic-bezier(.2,.6,.2,1) both; }
+@keyframes ic-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ic-modal-rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
 
 /* ============================================================================
    MOBILE — component-level tweaks (≤720px). Token scaling is in

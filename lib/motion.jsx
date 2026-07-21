@@ -55,6 +55,61 @@ function AutoCount({ text, duration }) {
   return <CountUp to={num} suffix={m[2]} decimals={decimals} duration={duration} />;
 }
 
+/* ---- Type-out (typewriter) -------------------------------------------------
+   Types text character-by-character. Two modes:
+   - single `text`: types once and stops (caret fades). Good for headings/leads.
+   - `strings` array: types → holds → deletes → next, looping. Good for a hero
+     that cycles taglines.
+   Honors prefers-reduced-motion (shows final text, no caret). Optionally waits
+   until scrolled into view before starting. */
+function TypeOut({
+  text, strings, as: As = 'span', className = '', style,
+  typeSpeed = 42, deleteSpeed = 22, hold = 1900, startDelay = 180,
+  loop, caret = true, caretColor, onView = true, cursorStyle,
+}) {
+  const items = (strings && strings.length) ? strings : [text || ''];
+  const cycles = items.length > 1;
+  const shouldLoop = loop === undefined ? cycles : loop;
+  const [out, setOut] = React.useState('');
+  const [done, setDone] = React.useState(false);
+  const ref = React.useRef(null);
+  const reduce = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  React.useEffect(() => {
+    if (reduce) { setOut(items[0]); setDone(true); return; }
+    let cancelled = false;
+    const timers = [];
+    const wait = (ms) => new Promise(res => timers.push(setTimeout(res, ms)));
+    const typeStr = async (str) => { for (let i = 1; i <= str.length; i++) { if (cancelled) return; setOut(str.slice(0, i)); await wait(typeSpeed); } };
+    const delStr = async (str) => { for (let i = str.length; i >= 0; i--) { if (cancelled) return; setOut(str.slice(0, i)); await wait(deleteSpeed); } };
+    const run = async () => {
+      await wait(startDelay);
+      let i = 0;
+      while (!cancelled) {
+        await typeStr(items[i]);
+        if (!cycles && !shouldLoop) { setDone(true); return; }
+        await wait(hold);
+        if (!shouldLoop && i === items.length - 1) { setDone(true); return; }
+        await delStr(items[i]);
+        i = (i + 1) % items.length;
+      }
+    };
+    let io;
+    if (onView && 'IntersectionObserver' in window && ref.current) {
+      io = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { io.disconnect(); run(); } }), { threshold: 0.25 });
+      io.observe(ref.current);
+    } else { run(); }
+    return () => { cancelled = true; timers.forEach(clearTimeout); if (io) io.disconnect(); };
+  }, []);
+
+  return (
+    <As ref={ref} className={className} style={style}>
+      {out || '​'}
+      {caret && !done && <span className="type-caret" aria-hidden="true" style={{ color: caretColor, ...cursorStyle }}>&nbsp;</span>}
+    </As>
+  );
+}
+
 /* ---- Geometric motif graphics (brand palette, animated) ------------------- */
 function Motif({ variant = 'nodes', style, className = '' }) {
   const O = 'var(--accent-orange)', M = 'var(--accent-magenta)', P = 'var(--accent-periwinkle)', C = 'var(--accent-mint)';
@@ -171,4 +226,4 @@ function GradientPanel({ children, height = 220, motif, radius = 'var(--radius-s
   );
 }
 
-Object.assign(window, { Reveal, CountUp, AutoCount, Motif, GradientPanel });
+Object.assign(window, { Reveal, CountUp, AutoCount, TypeOut, Motif, GradientPanel });
