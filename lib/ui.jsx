@@ -259,32 +259,64 @@ function Accordion({ label, children, dark, defaultOpen = false, meta, sub = fal
   );
 }
 
-/* Indra-style image-led solution card — animated visual header + title + tags,
-   links to the detail page. Shared by the home + solutions pages. */
-function SolutionCard({ s }) {
-  const scene = (window.IC && IC.solutionScene[s.id]) || 'network';
-  return (
-    <a href={`solution.html?id=${s.id}`} className="sm-host ic-card-link" style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
-      <article className="ic-lift ic-lift-light" style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--canvas)' }}>
-        <div className="ic-card-media" style={{ position: 'relative', height: 168, overflow: 'hidden', background: 'var(--canvas-dark)' }}>
-          <Viz scene={scene} intensity="subtle" />
-          <span className="t-mono-label" style={{ position: 'absolute', top: 'var(--space-lg)', left: 'var(--space-lg)', color: 'var(--accent-periwinkle)' }}>{s.no}</span>
-        </div>
-        <div style={{ padding: 'var(--space-2xl)', display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-md)' }}>
-            <h3 className="t-display-md" style={{ color: 'var(--ink)' }}>{s.name}</h3>
-            <i data-lucide="arrow-up-right" className="sol-arrow" style={{ width: 18, height: 18, color: 'var(--body)', flex: 'none', marginTop: 4, transition: 'transform .2s ease, color .2s ease' }}></i>
-          </div>
-          <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-md)', flex: 1 }}>{s.summary}</p>
-          <div style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-lg)', borderTop: '1px solid var(--hairline)', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {s.capabilities.slice(0, 3).map(c => (
-              <span key={c} className="t-mono-caption" style={{ color: 'var(--body)', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-xs)', padding: '3px 7px' }}>{c}</span>
-            ))}
-          </div>
-        </div>
-      </article>
-    </a>
+/* Full-bleed image card (Indra style): a photo fills the card; the lower area
+   is the same image blurred + darkened behind the text; chamfered corners; an
+   arrow appears on hover. Falls back to the animated canvas scene if the photo
+   is missing. Used for both solutions (links) and products (opens). */
+function ImageCard({ id, no, title, body, scene, href, onClick, tall }) {
+  const [broken, setBroken] = React.useState(false);
+  const img = (window.IC && IC.cardImages && IC.cardImages[id]) || null;
+  const media = (!img || broken)
+    ? <div className="ic-imgcard-bg"><Viz scene={scene || 'network'} intensity="subtle" /></div>
+    : <img className="ic-imgcard-bg" src={img} alt="" onError={() => setBroken(true)} />;
+  const inner = (
+    <>
+      {media}
+      {no && <span className="ic-imgcard-no t-mono-label">{no}</span>}
+      <i data-lucide="arrow-up-right" className="ic-imgcard-arrow"></i>
+      <div className="ic-imgcard-panel">
+        <h3 className="t-display-md ic-imgcard-title">{title}</h3>
+        {body && <p className="t-body-md ic-imgcard-body">{body}</p>}
+      </div>
+    </>
   );
+  const cls = `ic-imgcard ic-card-link${tall ? ' tall' : ''}`;
+  if (href) return <a href={href} className={cls}>{inner}</a>;
+  return <button type="button" onClick={onClick} className={cls} style={{ border: 0, textAlign: 'left', cursor: 'pointer', font: 'inherit' }}>{inner}</button>;
+}
+
+/* Solution card — image card that links to the detail page. */
+function SolutionCard({ s }) {
+  return <ImageCard id={s.id} no={s.no} title={s.name} body={s.summary} scene={(window.IC && IC.solutionScene[s.id]) || 'network'} href={`solution.html?id=${s.id}`} />;
+}
+
+/* Technology-partner marquee — grayscale logo carousel, label above. Shared. */
+function PartnerLogoItem({ p }) {
+  const [ok, setOk] = React.useState(!!(window.IC && IC.partnersHaveLogos));
+  return (
+    <div className="ic-partner" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 72, padding: '0 var(--space-3xl)' }}>
+      {ok
+        ? <img src={p.file} alt={p.name} onError={() => setOk(false)} style={{ height: 32 * (p.scale || 1), width: 'auto', maxWidth: 200, objectFit: 'contain', display: 'block' }} />
+        : <span style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: 24, letterSpacing: '-0.6px', color: 'var(--ink)', whiteSpace: 'nowrap' }}>{p.name}</span>}
+    </div>
+  );
+}
+function PartnerMarquee({ label = 'Technology Partners', labelBelow = false }) {
+  const items = IC.partnerLogos;
+  const heading = label ? (
+    <Container style={{ paddingTop: labelBelow ? 'var(--space-2xl)' : 0, paddingBottom: labelBelow ? 0 : 'var(--space-2xl)' }}>
+      <p style={{ textAlign: 'center', margin: 0, fontFamily: 'var(--font-mono)', fontWeight: 500, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink)' }}>{label}</p>
+    </Container>
+  ) : null;
+  const strip = (
+    <div className="ic-marquee" style={{ position: 'relative', overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)', maskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)' }}>
+      <div className="ic-marquee-track" style={{ display: 'flex', alignItems: 'center', width: 'max-content' }}>
+        {items.map((p) => <PartnerLogoItem key={p.id} p={p} />)}
+        {items.map((p) => <PartnerLogoItem key={p.id + '-2'} p={p} />)}
+      </div>
+    </div>
+  );
+  return <>{!labelBelow && heading}{strip}{labelBelow && heading}</>;
 }
 
 /* Modal / popup — dark card over a dimmed, blurred backdrop. Closes on
@@ -368,5 +400,5 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
 
 Object.assign(window, {
   Container, Band, Eyebrow, SectionHead, Pill, ArrowLink, Tag, PlaceholderBlock,
-  StatTiles, Card, SpecBadge, CertSeal, SolutionCard, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
+  StatTiles, Card, SpecBadge, CertSeal, ImageCard, SolutionCard, PartnerMarquee, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
 });

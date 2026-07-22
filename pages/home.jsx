@@ -38,36 +38,11 @@ function HomeHero({ t }) {
 
 }
 
-/* Single partner logo — real image when logos are ready, clean wordmark otherwise. */
-function PartnerLogo({ p }) {
-  const [ok, setOk] = React.useState(!!IC.partnersHaveLogos);
-  return (
-    <div className="ic-partner" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 72, padding: '0 var(--space-3xl)' }}>
-      {ok ?
-      <img src={p.file} alt={p.name} onError={() => setOk(false)} style={{ height: 32 * (p.scale || 1), width: 'auto', maxWidth: 200, objectFit: 'contain', display: 'block' }} /> :
-
-      <span style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: 24, letterSpacing: '-0.6px', color: 'var(--ink)', whiteSpace: 'nowrap' }}>{p.name}</span>
-      }
-    </div>);
-
-}
-
-/* Technology partners — bold label above, seamless horizontal marquee below. */
+/* Technology partners — bold label above, seamless logo marquee below. */
 function PartnerBar() {
-  const items = IC.partnerLogos;
   return (
-    <section style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--hairline)' }}>
-      <Container style={{ paddingTop: 'var(--space-3xl)', paddingBottom: 'var(--space-lg)' }}>
-        <p style={{ textAlign: 'center', margin: 0, fontFamily: 'var(--font-mono)', fontWeight: 500, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink)' }}>Technology Partners</p>
-      </Container>
-      <div style={{ paddingBottom: 'var(--space-3xl)' }}>
-        <div className="ic-marquee" style={{ position: 'relative', overflow: 'hidden', WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)', maskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)' }}>
-          <div className="ic-marquee-track" style={{ display: 'flex', alignItems: 'center', width: 'max-content' }}>
-            {items.map((p) => <PartnerLogo key={p.id} p={p} />)}
-            {items.map((p) => <PartnerLogo key={p.id + '-2'} p={p} />)}
-          </div>
-        </div>
-      </div>
+    <section style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--hairline)', paddingTop: 'var(--space-3xl)', paddingBottom: 'var(--space-3xl)' }}>
+      <PartnerMarquee label="Technology Partners" />
     </section>);
 
 }
@@ -91,6 +66,8 @@ function MetricTile({ m, tint }) {
 function WhoWeAre() {
   const trackRef = React.useRef(null);
   const stageRef = React.useRef(null);
+  const colsRef = React.useRef(null);
+  const boxesRef = React.useRef(null);
   const rows = [
     { label: 'WHAT WE DO', body: IC.whoWeAre[0] },
     { label: 'CERTIFICATIONS & FRAMEWORK', body: IC.whoWeAre[1] },
@@ -105,12 +82,26 @@ function WhoWeAre() {
     const wide = () => window.innerWidth >= 1001;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp = (v) => Math.max(0, Math.min(1, v));
+    const ease = (t) => t * t * (3 - 2 * t); // smoothstep
     const update = () => {
-      if (!wide() || reduce) { stage.style.setProperty('--p', '1'); return; }
+      const cols = colsRef.current, boxes = boxesRef.current;
+      if (!wide() || reduce) {
+        stage.style.setProperty('--p', '1');
+        if (boxes) boxes.style.transform = '';
+        return;
+      }
       const rect = track.getBoundingClientRect();
       const total = track.offsetHeight - stage.offsetHeight;
-      const p = total > 0 ? clamp((72 - rect.top) / total) : 1;
+      const p = ease(total > 0 ? clamp((72 - rect.top) / total) : 1);
       stage.style.setProperty('--p', p.toFixed(3));
+      // Center the boxes at p=0 (offset from their final right-column slot to the
+      // row centre), sliding to their slot at p=1.
+      if (cols && boxes) {
+        const offset = cols.offsetWidth / 2 - (boxes.offsetLeft + boxes.offsetWidth / 2);
+        const tx = (offset * (1 - p)).toFixed(1);
+        const sc = (1 + (1 - p) * 0.06).toFixed(3);
+        boxes.style.transform = `translateX(${tx}px) scale(${sc})`;
+      }
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
@@ -129,7 +120,7 @@ function WhoWeAre() {
       <div ref={trackRef} className="who-track">
         <div ref={stageRef} className="who-stage" style={{ '--p': 1 }}>
           <Container>
-            <div className="who-cols" style={{ display: 'grid', gridTemplateColumns: '1.25fr 0.75fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
+            <div ref={colsRef} className="who-cols" style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.25fr 0.75fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
               {/* LEFT — detail dropdowns, revealed by scroll progress */}
               <div className="who-detail">
                 <div style={{ borderTop: '1px solid var(--hairline)' }}>
@@ -148,7 +139,7 @@ function WhoWeAre() {
                 </div>
               </div>
               {/* RIGHT — metric tiles: prominent, then slide aside */}
-              <div className="who-boxes" style={{ display: 'grid', gap: 'var(--space-lg)' }}>
+              <div ref={boxesRef} className="who-boxes" style={{ display: 'grid', gap: 'var(--space-lg)' }}>
                 {IC.metrics.map((m, i) => <MetricTile key={m.l} m={m} tint={tints[i % tints.length]} />)}
               </div>
             </div>

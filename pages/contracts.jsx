@@ -57,21 +57,13 @@ function App() {
         </Reveal>
       </Band>
 
-      {/* Partnerships */}
+      {/* Partnerships — logo carousel */}
       <Band>
         <Reveal>
           <Eyebrow>PARTNERSHIPS</Eyebrow>
           <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>Technology partners we build with</h2>
         </Reveal>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-lg)' }}>
-          {IC.partners.map((n, i) => (
-            <Reveal key={n} delay={i * 70} style={{ flex: '1 1 200px' }}>
-              <div className="ic-lift ic-lift-light" style={{ border: '1px solid var(--hairline)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-lg) var(--space-2xl)', textAlign: 'center', height: '100%', display: 'grid', placeItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: 18, letterSpacing: '-0.4px', color: '#9a9a9a', filter: 'grayscale(1)' }}>{n}</span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <PartnerMarquee label={null} />
       </Band>
 
       <Footer />

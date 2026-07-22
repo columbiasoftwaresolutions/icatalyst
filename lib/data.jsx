@@ -187,6 +187,22 @@ IC.offices = [
 
 IC.inquiryTypes = ['General inquiry', 'Solutions & services', 'Products', 'Contracts & teaming', 'Careers', 'Partnership'];
 
+/* Card background images (Indra-style image cards). Drop real photos at these
+   paths; until then each card falls back to its animated canvas scene.
+   Recommended ~1200×900 JPG, cool/technical, subject in the upper half. */
+IC.cardImages = {
+  // Solutions
+  ai: 'assets/cards/ai.jpg',
+  cloud: 'assets/cards/cloud.jpg',
+  data: 'assets/cards/data.jpg',
+  it: 'assets/cards/it.jpg',
+  program: 'assets/cards/program.jpg',
+  // Products
+  geospatial: 'assets/cards/geospatial.jpg',
+  semantic: 'assets/cards/semantic.jpg',
+  assistant: 'assets/cards/assistant.jpg',
+};
+
 /* Graphic motif per solution / product (see lib/motion.jsx Motif variants). */
 IC.solutionMotif = { ai: 'nodes', cloud: 'arcs', data: 'bars', it: 'grid', program: 'flow' };
 IC.productMotif = { geospatial: 'topo', semantic: 'nodes', assistant: 'flow' };

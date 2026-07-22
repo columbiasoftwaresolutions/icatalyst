@@ -1,6 +1,22 @@
+/* Centered stat box — big count-up + label, both axes centered. */
+function StatBox({ n, label, tint }) {
+  return (
+    <div style={{ background: tint, borderRadius: 'var(--radius-sm)', padding: 'var(--space-4xl) var(--space-2xl)', minHeight: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+      <span className="t-display-xl" style={{ color: 'var(--ink)', lineHeight: 1, fontFeatureSettings: '"tnum"' }}><AutoCount text={n} /></span>
+      <span className="t-mono-label" style={{ color: 'var(--ink)', opacity: .72, marginTop: 'var(--space-md)', maxWidth: 220 }}>{label}</span>
+    </div>
+  );
+}
+
 /* Careers — culture, open positions, benefits. With graphics + motion. */
 function App() {
   React.useEffect(() => { refreshIcons(); });
+  const benefits = [
+    { label: 'HEALTH & WELLNESS', body: 'Medical, dental, and vision coverage for you and your family, plus wellness support.' },
+    { label: 'RETIREMENT & FINANCIAL', body: 'Retirement savings with company contribution and financial-planning resources.' },
+    { label: 'TIME OFF & FLEXIBILITY', body: 'Generous paid time off, holidays, and flexible / hybrid work arrangements.' },
+    { label: 'LEARNING & DEVELOPMENT', body: 'Certifications, training stipends, and continuous-learning programs to grow your career.' },
+  ];
   return (
     <div style={{ background: 'var(--canvas)' }}>
       <NavBar current="careers" />
@@ -12,16 +28,14 @@ function App() {
         graphic="flow"
       />
 
-      {/* Culture + retention stat */}
+      {/* Culture + retention stats */}
       <Band>
-        <div className="split-grid" style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
+        <div className="split-grid" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
           <Reveal>
-            <GradientPanel height={260} motif="arcs">
-              <div style={{ position: 'absolute', inset: 0, padding: 'var(--space-4xl) var(--space-3xl)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <span className="t-display-xxl" style={{ color: 'rgba(1,1,32,.9)' }}><AutoCount text="90%+" /></span>
-                <span className="t-mono-label" style={{ color: 'rgba(1,1,32,.7)', display: 'block', marginTop: 'var(--space-md)' }}>EMPLOYEE RETENTION · PAST 5 YEARS</span>
-              </div>
-            </GradientPanel>
+            <div style={{ display: 'grid', gap: 'var(--space-lg)' }}>
+              <StatBox n="90%+" label="EMPLOYEE RETENTION · PAST 5 YEARS" tint="var(--accent-mint)" />
+              <StatBox n="19+" label="YEARS DELIVERING SINCE 2007" tint="var(--accent-periwinkle)" />
+            </div>
           </Reveal>
           <Reveal delay={120}>
             <Eyebrow>OUR CULTURE</Eyebrow>
@@ -53,16 +67,19 @@ function App() {
         </Reveal>
       </Band>
 
-      {/* Benefits */}
+      {/* Benefits — press +/- to reveal */}
       <Band>
         <Reveal>
           <Eyebrow>BENEFITS</Eyebrow>
-          <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>What we offer</h2>
+          <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-md)', maxWidth: 620 }}>What we offer</h2>
+          <p className="t-body-md" style={{ color: 'var(--body)', marginBottom: 'var(--space-3xl)' }}>
+            <Tag>FINAL BENEFITS COPY — TO BE PROVIDED</Tag>
+          </p>
         </Reveal>
         <Reveal delay={100}>
-          <PlaceholderBlock note="BENEFITS LIST — TO BE PROVIDED">
-            Health, retirement, leave, learning stipends, and other benefits will be listed here once supplied.
-          </PlaceholderBlock>
+          <div style={{ borderTop: '1px solid var(--hairline)', maxWidth: 820 }}>
+            {benefits.map(b => <Accordion key={b.label} label={b.label}>{b.body}</Accordion>)}
+          </div>
         </Reveal>
       </Band>
 
