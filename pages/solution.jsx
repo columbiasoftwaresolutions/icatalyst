@@ -4,26 +4,6 @@ function getSolution() {
   return IC.solutions.find(s => s.id === id) || IC.solutions[0];
 }
 
-function SolutionNav({ current }) {
-  const idx = IC.solutions.findIndex(s => s.id === current.id);
-  const prev = IC.solutions[(idx - 1 + IC.solutions.length) % IC.solutions.length];
-  const next = IC.solutions[(idx + 1) % IC.solutions.length];
-  const cell = (s, dir) => (
-    <a href={`solution.html?id=${s.id}`} style={{ textDecoration: 'none', flex: 1 }}>
-      <Card className="ic-lift ic-lift-light" style={{ height: '100%' }}>
-        <span className="t-mono-label" style={{ color: 'var(--body)' }}>{dir === 'prev' ? 'PREVIOUS' : 'NEXT'} · {s.no}</span>
-        <h4 className="t-display-md" style={{ color: 'var(--ink)', marginTop: 'var(--space-sm)' }}>{s.name}</h4>
-      </Card>
-    </a>
-  );
-  return (
-    <div className="two-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)' }}>
-      {cell(prev, 'prev')}
-      {cell(next, 'next')}
-    </div>
-  );
-}
-
 function App() {
   const s = getSolution();
   React.useEffect(() => { refreshIcons(); document.title = `${s.name} — iCatalyst, Inc.`; });
@@ -76,11 +56,13 @@ function App() {
         </PlaceholderBlock>
       </Band>
 
-      {/* Explore more */}
+      {/* Back to all solutions */}
       <Band>
-        <Eyebrow>EXPLORE MORE</Eyebrow>
-        <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-3xl)' }}>Continue through our solutions</h2>
-        <SolutionNav current={s} />
+        <a href="solutions.html" className="t-mono-button" style={{ color: 'var(--ink)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10 }}
+          onMouseEnter={e => { const a = e.currentTarget.querySelector('i'); if (a) a.style.transform = 'translateX(-3px)'; }}
+          onMouseLeave={e => { const a = e.currentTarget.querySelector('i'); if (a) a.style.transform = 'none'; }}>
+          <i data-lucide="arrow-left" style={{ width: 18, height: 18, transition: 'transform .18s ease' }}></i>Back to all solutions
+        </a>
       </Band>
 
       <Footer />

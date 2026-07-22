@@ -88,6 +88,10 @@
 .sm-host:hover .sol-rule { width: 100%; }
 .sm-host:hover .sol-arrow { transform: translate(2px,-2px); color: var(--accent-magenta); }
 
+/* Image-led card: subtle zoom of the visual header on hover */
+.ic-card-media canvas { transition: transform .5s cubic-bezier(.2,.6,.2,1); }
+.ic-card-link:hover .ic-card-media canvas { transform: scale(1.06); }
+
 /* ---- Technology-partner marquee ------------------------------------------- */
 .ic-marquee-track { animation: ic-marquee 34s linear infinite; }
 .ic-partner img,

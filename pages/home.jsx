@@ -123,7 +123,7 @@ function WhoWeAre() {
       <Container style={{ paddingTop: 'var(--space-section)' }}>
         <Eyebrow>WHO WE ARE</Eyebrow>
         <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: 760 }}
-          text="A trusted technology partner for mission-critical work" loop={false} caretColor="var(--accent-magenta)" />
+          text="A trusted technology partner for mission-critical work" loop={false} onView={false} caretColor="var(--accent-magenta)" />
       </Container>
 
       <div ref={trackRef} className="who-track">
@@ -159,27 +159,7 @@ function WhoWeAre() {
 
 }
 
-/* One clean solution card — shared shape (mono index, accent rule, title, arrow). */
-function SolutionCard({ s }) {
-  return (
-    <a href={`solution.html?id=${s.id}`} className="sm-host" style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
-      <Card className="ic-lift ic-lift-light" style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', padding: 'var(--space-3xl) var(--space-2xl)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span className="t-mono-label" style={{ color: 'var(--accent-magenta)' }}>{s.no}</span>
-          <i data-lucide="arrow-up-right" className="sol-arrow" style={{ width: 18, height: 18, color: 'var(--body)', transition: 'transform .2s ease, color .2s ease' }}></i>
-        </div>
-        <div className="sol-rule" style={{ marginTop: 'var(--space-lg)' }}>
-          <span className="seg-red"></span>
-          <span className="seg-blue"></span>
-        </div>
-        <h3 className="t-display-md" style={{ color: 'var(--ink)', marginTop: 'var(--space-2xl)' }}>{s.name}</h3>
-        <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-md)', flex: 1 }}>{s.summary}</p>
-      </Card>
-    </a>);
-
-}
-
-/* Solutions — 5 clean cards + a dark "view all" tile. */
+/* Solutions — 5 image-led cards (shared SolutionCard) + a dark "view all" tile. */
 function HomeSolutions() {
   return (
     <section style={{ background: 'var(--canvas)' }} data-screen-label="Solutions">
@@ -256,7 +236,7 @@ function HomeCTA() {
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)', textAlign: 'center' }}>
         <Eyebrow style={{ textAlign: 'center' }}>ACCELERATING YOUR SUCCESS</Eyebrow>
         <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', maxWidth: 680, margin: 'var(--space-lg) auto 0' }}
-          text="Let’s accelerate your mission" loop={false} caretColor="var(--accent-magenta)" />
+          text="Let’s accelerate your mission" loop={false} onView={false} caretColor="var(--accent-magenta)" />
         <p className="t-body-lg" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>Innovation. Intelligence. Integrity.</p>
         <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', marginTop: 'var(--space-2xl)', flexWrap: 'wrap' }}>
           <Pill variant="primary" href="contact.html">Contact us</Pill>

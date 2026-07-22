@@ -43,7 +43,7 @@ function SectionHead({ eyebrow, title, lead, dark, align = 'left', max = 620, ty
     <div style={{ textAlign: align, marginLeft: align === 'center' ? 'auto' : 0, marginRight: align === 'center' ? 'auto' : 0, maxWidth: align === 'center' ? max : 'none' }}>
       {eyebrow && <Eyebrow dark={dark}>{eyebrow}</Eyebrow>}
       {type
-        ? <TypeOut as="h2" className="t-display-xl" style={headStyle} text={title} loop={false} caretColor={dark ? 'var(--accent-periwinkle)' : 'var(--accent-magenta)'} />
+        ? <TypeOut as="h2" className="t-display-xl" style={headStyle} text={title} loop={false} onView={false} caretColor={dark ? 'var(--accent-periwinkle)' : 'var(--accent-magenta)'} />
         : <h2 className="t-display-xl" style={headStyle}>{title}</h2>}
       {lead && <p className="t-body-lg" style={{ color: dark ? '#b9bcce' : 'var(--body)', marginTop: 'var(--space-lg)', maxWidth: align === 'center' ? 'none' : max }}>{lead}</p>}
     </div>
@@ -259,6 +259,34 @@ function Accordion({ label, children, dark, defaultOpen = false, meta, sub = fal
   );
 }
 
+/* Indra-style image-led solution card — animated visual header + title + tags,
+   links to the detail page. Shared by the home + solutions pages. */
+function SolutionCard({ s }) {
+  const scene = (window.IC && IC.solutionScene[s.id]) || 'network';
+  return (
+    <a href={`solution.html?id=${s.id}`} className="sm-host ic-card-link" style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
+      <article className="ic-lift ic-lift-light" style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--canvas)' }}>
+        <div className="ic-card-media" style={{ position: 'relative', height: 168, overflow: 'hidden', background: 'var(--canvas-dark)' }}>
+          <Viz scene={scene} intensity="subtle" />
+          <span className="t-mono-label" style={{ position: 'absolute', top: 'var(--space-lg)', left: 'var(--space-lg)', color: 'var(--accent-periwinkle)' }}>{s.no}</span>
+        </div>
+        <div style={{ padding: 'var(--space-2xl)', display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-md)' }}>
+            <h3 className="t-display-md" style={{ color: 'var(--ink)' }}>{s.name}</h3>
+            <i data-lucide="arrow-up-right" className="sol-arrow" style={{ width: 18, height: 18, color: 'var(--body)', flex: 'none', marginTop: 4, transition: 'transform .2s ease, color .2s ease' }}></i>
+          </div>
+          <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-md)', flex: 1 }}>{s.summary}</p>
+          <div style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-lg)', borderTop: '1px solid var(--hairline)', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {s.capabilities.slice(0, 3).map(c => (
+              <span key={c} className="t-mono-caption" style={{ color: 'var(--body)', border: '1px solid var(--hairline)', borderRadius: 'var(--radius-xs)', padding: '3px 7px' }}>{c}</span>
+            ))}
+          </div>
+        </div>
+      </article>
+    </a>
+  );
+}
+
 /* Modal / popup — dark card over a dimmed, blurred backdrop. Closes on
    overlay click, the × button, or Escape. Locks body scroll while open. */
 function Modal({ open, onClose, eyebrow, title, children, maxWidth = 760 }) {
@@ -340,5 +368,5 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
 
 Object.assign(window, {
   Container, Band, Eyebrow, SectionHead, Pill, ArrowLink, Tag, PlaceholderBlock,
-  StatTiles, Card, SpecBadge, CertSeal, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
+  StatTiles, Card, SpecBadge, CertSeal, SolutionCard, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
 });
