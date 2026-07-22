@@ -72,79 +72,89 @@ function PartnerBar() {
 
 }
 
-/* Our Philosophy — opens as a popup from a text trigger (no longer a section). */
-function PhilosophyButton() {
-  const [open, setOpen] = React.useState(false);
-  React.useEffect(() => { refreshIcons(); }, [open]);
+/* Metric tile — big count-up number + label. */
+function MetricTile({ m, tint }) {
   return (
-    <>
-      <button onClick={() => setOpen(true)} className="t-mono-button" style={{
-        border: 0, background: 'transparent', cursor: 'pointer', color: 'var(--ink)',
-        display: 'inline-flex', alignItems: 'center', gap: 8, padding: 0,
-      }}
-      onMouseEnter={e => { const a = e.currentTarget.querySelector('i'); if (a) a.style.transform = 'translate(2px,-2px)'; }}
-      onMouseLeave={e => { const a = e.currentTarget.querySelector('i'); if (a) a.style.transform = 'none'; }}>
-        Our philosophy<i data-lucide="arrow-up-right" style={{ width: 16, height: 16, transition: 'transform .18s ease' }}></i>
-      </button>
-      <Modal open={open} onClose={() => setOpen(false)} eyebrow="OUR PHILOSOPHY"
-        title="We don’t just deliver technology — we accelerate outcomes">
-        {IC.philosophy.intro.map((p, i) =>
-          <p key={i} className="t-body-md" style={{ color: '#b9bcce', marginTop: i ? 'var(--space-lg)' : 0 }}>{p}</p>
-        )}
-        <div style={{ display: 'grid', gap: 'var(--space-lg)', marginTop: 'var(--space-3xl)' }}>
-          {IC.philosophy.values.map((v) =>
-            <div key={v.e} style={{ borderTop: '1px solid var(--hairline-on-dark)', paddingTop: 'var(--space-lg)' }}>
-              <span className="t-mono-label" style={{ color: 'var(--accent-periwinkle)' }}>{v.e}</span>
-              <p className="t-body-md" style={{ color: '#b9bcce', marginTop: 'var(--space-xs)' }}>{v.b}</p>
-            </div>
-          )}
-        </div>
-        <p className="t-body-md" style={{ color: '#8388a8', marginTop: 'var(--space-3xl)' }}>{IC.philosophy.closing}</p>
-      </Modal>
-    </>);
-
+    <div className="ic-lift" style={{ background: tint, borderRadius: 'var(--radius-sm)', padding: 'var(--space-2xl)' }}>
+      <span className="t-display-xl" style={{ color: 'var(--ink)', fontFeatureSettings: '"tnum"' }}>
+        <CountUp to={parseFloat(m.num)} prefix={m.pre} suffix={m.suf} />
+      </span>
+      <span className="t-body-md" style={{ color: 'var(--ink)', opacity: .72, display: 'block', marginTop: 'var(--space-sm)' }}>{m.l}</span>
+    </div>
+  );
 }
 
-/* Who We Are — intro + detail dropdowns on the left; metric tiles reveal in from
-   the right, then stay anchored (sticky) as you scroll the section. */
+/* Who We Are — scroll-locked reveal: the metric tiles hold prominent while the
+   section pins, then slide aside as the detail dropdowns reveal on the left.
+   Detail rows include Our Philosophy as a "+" that nests the three principles
+   as sub-dropdowns. Falls back to a simple two-column layout on narrow screens. */
 function WhoWeAre() {
+  const trackRef = React.useRef(null);
+  const stageRef = React.useRef(null);
   const rows = [
-  { label: 'WHAT WE DO', body: IC.whoWeAre[0] },
-  { label: 'CERTIFICATIONS & FRAMEWORK', body: IC.whoWeAre[1] },
-  { label: 'CONTRACT VEHICLES & PARTNERS', body: IC.whoWeAre[2] },
-  { label: 'OUR PEOPLE', body: IC.whoWeAre[3] }];
+    { label: 'WHAT WE DO', body: IC.whoWeAre[0] },
+    { label: 'CERTIFICATIONS & FRAMEWORK', body: IC.whoWeAre[1] },
+    { label: 'CONTRACT VEHICLES & PARTNERS', body: IC.whoWeAre[2] },
+    { label: 'OUR PEOPLE', body: IC.whoWeAre[3] },
+  ];
+  const tints = ['var(--accent-mint)', 'var(--accent-periwinkle)', 'var(--accent-mint)'];
+
+  React.useEffect(() => {
+    const track = trackRef.current, stage = stageRef.current;
+    if (!track || !stage) return;
+    const wide = () => window.innerWidth >= 1001;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp = (v) => Math.max(0, Math.min(1, v));
+    const update = () => {
+      if (!wide() || reduce) { stage.style.setProperty('--p', '1'); return; }
+      const rect = track.getBoundingClientRect();
+      const total = track.offsetHeight - stage.offsetHeight;
+      const p = total > 0 ? clamp((72 - rect.top) / total) : 1;
+      stage.style.setProperty('--p', p.toFixed(3));
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => { window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
+  }, []);
 
   return (
     <section id="who" style={{ background: 'var(--canvas)', scrollMarginTop: 80 }} data-screen-label="Who We Are">
-      <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)' }}>
+      <Container style={{ paddingTop: 'var(--space-section)' }}>
         <Eyebrow>WHO WE ARE</Eyebrow>
         <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: 760 }}
           text="A trusted technology partner for mission-critical work" loop={false} caretColor="var(--accent-magenta)" />
-        <div className="split-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.7fr', gap: 'var(--space-5xl)', marginTop: 'var(--space-3xl)', alignItems: 'start' }}>
-          <div>
-            <div style={{ borderTop: '1px solid var(--hairline)' }}>
-              {rows.map((r) =>
-              <Accordion key={r.label} label={r.label}>{r.body}</Accordion>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--space-2xl)', flexWrap: 'wrap', marginTop: 'var(--space-2xl)', alignItems: 'center' }}>
-              <ArrowLink href="solutions.html">Our solutions</ArrowLink>
-              <ArrowLink href="contracts.html">Contracts &amp; certifications</ArrowLink>
-              <PhilosophyButton />
-            </div>
-          </div>
-          <div style={{ position: 'sticky', top: 88, alignSelf: 'start', display: 'grid', gap: 'var(--space-lg)' }}>
-            {IC.metrics.map((m, i) =>
-            <Reveal key={m.l} delay={i * 120} className="from-right">
-                <div className="ic-lift" style={{ background: i % 2 ? 'var(--accent-periwinkle)' : 'var(--accent-mint)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2xl)' }}>
-                  <span className="t-display-xl" style={{ color: 'var(--ink)' }}><AutoCount text={m.n} /></span>
-                  <span className="t-mono-label" style={{ color: 'var(--ink)', opacity: .7, display: 'block', marginTop: 'var(--space-sm)' }}>{m.l}</span>
-                </div>
-              </Reveal>
-            )}
-          </div>
-        </div>
       </Container>
+
+      <div ref={trackRef} className="who-track">
+        <div ref={stageRef} className="who-stage" style={{ '--p': 1 }}>
+          <Container>
+            <div className="who-cols" style={{ display: 'grid', gridTemplateColumns: '1.25fr 0.75fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
+              {/* LEFT — detail dropdowns, revealed by scroll progress */}
+              <div className="who-detail">
+                <div style={{ borderTop: '1px solid var(--hairline)' }}>
+                  {rows.map((r) => <Accordion key={r.label} label={r.label}>{r.body}</Accordion>)}
+                  <Accordion label="OUR PHILOSOPHY" meta="Innovation · Intelligence · Integrity">
+                    <p className="t-body-md" style={{ color: 'var(--body)', maxWidth: 720 }}>{IC.philosophy.intro[0]}</p>
+                    <div style={{ borderTop: '1px solid var(--hairline)', marginTop: 'var(--space-lg)' }}>
+                      {IC.philosophy.values.map((v) => <Accordion key={v.e} label={v.e} sub>{v.b}</Accordion>)}
+                    </div>
+                    <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>{IC.philosophy.closing}</p>
+                  </Accordion>
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--space-2xl)', flexWrap: 'wrap', marginTop: 'var(--space-2xl)' }}>
+                  <ArrowLink href="solutions.html">Our solutions</ArrowLink>
+                  <ArrowLink href="contracts.html">Contracts &amp; certifications</ArrowLink>
+                </div>
+              </div>
+              {/* RIGHT — metric tiles: prominent, then slide aside */}
+              <div className="who-boxes" style={{ display: 'grid', gap: 'var(--space-lg)' }}>
+                {IC.metrics.map((m, i) => <MetricTile key={m.l} m={m} tint={tints[i % tints.length]} />)}
+              </div>
+            </div>
+          </Container>
+        </div>
+      </div>
     </section>);
 
 }
@@ -239,17 +249,18 @@ function HomeProducts({ t = {} }) {
 
 }
 
-/* Closing CTA — dark band. */
+/* Closing CTA — white band. */
 function HomeCTA() {
   return (
-    <section style={{ background: 'var(--canvas-dark)' }}>
+    <section style={{ background: 'var(--canvas)', borderTop: '1px solid var(--hairline)' }}>
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)', textAlign: 'center' }}>
-        <Eyebrow dark style={{ textAlign: 'center' }}>ACCELERATING YOUR SUCCESS</Eyebrow>
-        <h2 className="t-display-xl" style={{ color: 'var(--on-dark)', maxWidth: 680, margin: 'var(--space-lg) auto 0' }}>Let’s accelerate your mission</h2>
-        <p className="t-body-lg" style={{ color: '#b9bcce', marginTop: 'var(--space-lg)' }}>Innovation. Intelligence. Integrity.</p>
+        <Eyebrow style={{ textAlign: 'center' }}>ACCELERATING YOUR SUCCESS</Eyebrow>
+        <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', maxWidth: 680, margin: 'var(--space-lg) auto 0' }}
+          text="Let’s accelerate your mission" loop={false} caretColor="var(--accent-magenta)" />
+        <p className="t-body-lg" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>Innovation. Intelligence. Integrity.</p>
         <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', marginTop: 'var(--space-2xl)', flexWrap: 'wrap' }}>
-          <Pill variant="mint" href="contact.html">Contact us</Pill>
-          <Pill variant="ghost" href="solutions.html">Explore solutions</Pill>
+          <Pill variant="primary" href="contact.html">Contact us</Pill>
+          <Pill variant="outline" href="solutions.html">Explore solutions</Pill>
         </div>
       </Container>
     </section>);

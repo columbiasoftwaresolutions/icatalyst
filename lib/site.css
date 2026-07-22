@@ -142,6 +142,25 @@
 .ic-breathe { animation: ic-breathe 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes ic-breathe { 0%,100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
 
+/* ---- Who We Are: scroll-locked reveal -------------------------------------
+   The track gives scroll budget; the stage pins (sticky) and centers. As --p
+   (set by JS, 0→1) grows, the detail column fades/slides in while the metric
+   boxes slide from center to their side slot. --p defaults to 1 (all visible)
+   for no-JS / reduced-motion. */
+.who-track { position: relative; height: 190vh; }
+.who-stage { position: sticky; top: 72px; min-height: calc(100vh - 120px); display: flex; align-items: center; padding: var(--space-4xl) 0; }
+.who-detail { opacity: var(--p, 1); transform: translateX(calc((1 - var(--p, 1)) * -30px)); }
+.who-boxes { transform: translateX(calc((1 - var(--p, 1)) * -46%)) scale(calc(1 + (1 - var(--p, 1)) * 0.05)); transform-origin: center center; }
+@media (max-width: 1000px) {
+  .who-track { height: auto; }
+  .who-stage { position: static; min-height: 0; padding: var(--space-3xl) 0 var(--space-section); }
+  .who-cols { grid-template-columns: 1fr !important; }
+  .who-detail, .who-boxes { opacity: 1 !important; transform: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .who-detail, .who-boxes { opacity: 1 !important; transform: none !important; }
+}
+
 /* ---- Type-out caret -------------------------------------------------------- */
 .type-caret {
   display: inline-block;

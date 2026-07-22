@@ -158,6 +158,30 @@ function SpecBadge({ code, name, dark }) {
   );
 }
 
+/* Certification seal — circular emblem (double ring) + code/name. Stands in for
+   an official cert logo. */
+function CertSeal({ code, name, icon = 'shield-check', dark }) {
+  const ink = dark ? 'var(--on-dark)' : 'var(--ink)';
+  const sub = dark ? '#8388a8' : 'var(--body)';
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+      <span style={{
+        position: 'relative', width: 56, height: 56, flexShrink: 0, borderRadius: 'var(--radius-full)',
+        display: 'grid', placeItems: 'center',
+        background: dark ? 'var(--surface-dark-soft)' : 'var(--accent-mint)',
+        boxShadow: 'inset 0 0 0 1.5px var(--accent-magenta)',
+      }}>
+        <span style={{ position: 'absolute', inset: 5, borderRadius: 'var(--radius-full)', border: '1px dashed var(--accent-periwinkle)' }}></span>
+        <i data-lucide={icon} style={{ width: 22, height: 22, color: 'var(--accent-magenta)' }}></i>
+      </span>
+      <span style={{ display: 'grid', gap: 2 }}>
+        <span className="t-mono-label" style={{ color: ink }}>{code}</span>
+        <span className="t-mono-caption" style={{ color: sub }}>{name}</span>
+      </span>
+    </div>
+  );
+}
+
 /* Rotating value statements — cycles every few seconds with a soft fade. */
 function ValueRotator({ items, interval = 4200 }) {
   const [i, setI] = React.useState(0);
@@ -181,17 +205,29 @@ function ValueRotator({ items, interval = 4200 }) {
   );
 }
 
-/* Expandable dropdown row. Label (mono) + chevron; body reveals on click.
-   Works on light or dark (dark). Calm height/opacity ease, hairline divider. */
-function Accordion({ label, children, dark, defaultOpen = false, meta }) {
+/* Expandable dropdown row. Label (mono) + plus; body reveals on click.
+   Works on light or dark. Height animates 0↔content, then settles to `auto`
+   when open so nested accordions can grow without clipping. `sub` renders a
+   tighter, nested variant. */
+function Accordion({ label, children, dark, defaultOpen = false, meta, sub = false }) {
   const [open, setOpen] = React.useState(defaultOpen);
+  const wrapRef = React.useRef(null);
   const bodyRef = React.useRef(null);
-  const [h, setH] = React.useState(defaultOpen ? 'auto' : 0);
   React.useEffect(() => {
-    const el = bodyRef.current; if (!el) return;
-    setH(open ? el.scrollHeight : 0);
-  }, [open, children]);
+    const wrap = wrapRef.current, body = bodyRef.current;
+    if (!wrap || !body) return;
+    if (open) {
+      wrap.style.height = body.scrollHeight + 'px';
+      const done = (e) => { if (e.propertyName === 'height') { wrap.style.height = 'auto'; wrap.removeEventListener('transitionend', done); } };
+      wrap.addEventListener('transitionend', done);
+      return () => wrap.removeEventListener('transitionend', done);
+    } else {
+      wrap.style.height = body.scrollHeight + 'px';
+      requestAnimationFrame(() => { wrap.style.height = '0px'; });
+    }
+  }, [open]);
   const hair = dark ? 'var(--hairline-on-dark)' : 'var(--hairline)';
+  const pad = sub ? 'var(--space-lg) 0' : 'var(--space-2xl) 0';
   return (
     <div style={{ borderBottom: `1px solid ${hair}` }}>
       <button
@@ -201,19 +237,19 @@ function Accordion({ label, children, dark, defaultOpen = false, meta }) {
         style={{
           width: '100%', background: 'transparent', border: 0, cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-lg)',
-          padding: 'var(--space-2xl) 0', textAlign: 'left', color: dark ? 'var(--on-dark)' : 'var(--ink)',
+          padding: pad, textAlign: 'left', color: dark ? 'var(--on-dark)' : 'var(--ink)',
         }}
         onMouseEnter={e => e.currentTarget.style.opacity = '.78'}
         onMouseLeave={e => e.currentTarget.style.opacity = '1'}
       >
         <span style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-lg)', flexWrap: 'wrap' }}>
-          <span className="t-mono-label" style={{ color: open ? 'var(--accent-magenta)' : (dark ? 'var(--on-dark)' : 'var(--ink)'), transition: 'color .2s ease' }}>{label}</span>
+          <span className={sub ? 't-mono-caption' : 't-mono-label'} style={{ color: open ? 'var(--accent-magenta)' : (dark ? 'var(--on-dark)' : 'var(--ink)'), transition: 'color .2s ease' }}>{label}</span>
           {meta && <span className="t-mono-caption" style={{ color: dark ? '#8388a8' : 'var(--body)' }}>{meta}</span>}
         </span>
-        <i data-lucide="plus" style={{ width: 18, height: 18, flexShrink: 0, transition: 'transform .25s ease', transform: open ? 'rotate(45deg)' : 'none', color: dark ? '#8388a8' : 'var(--body)' }}></i>
+        <i data-lucide="plus" style={{ width: sub ? 15 : 18, height: sub ? 15 : 18, flexShrink: 0, transition: 'transform .25s ease', transform: open ? 'rotate(45deg)' : 'none', color: dark ? '#8388a8' : 'var(--body)' }}></i>
       </button>
-      <div style={{ height: h === 'auto' ? 'auto' : h, overflow: 'hidden', transition: 'height .28s ease', opacity: open ? 1 : 0 }}>
-        <div ref={bodyRef} style={{ paddingBottom: 'var(--space-2xl)' }}>
+      <div ref={wrapRef} style={{ height: defaultOpen ? 'auto' : 0, overflow: 'hidden', transition: 'height .3s cubic-bezier(.2,.6,.2,1)' }}>
+        <div ref={bodyRef} style={{ paddingBottom: sub ? 'var(--space-lg)' : 'var(--space-2xl)' }}>
           {typeof children === 'string'
             ? <p className="t-body-md" style={{ color: dark ? '#b9bcce' : 'var(--body)', maxWidth: 720 }}>{children}</p>
             : children}
@@ -304,5 +340,5 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
 
 Object.assign(window, {
   Container, Band, Eyebrow, SectionHead, Pill, ArrowLink, Tag, PlaceholderBlock,
-  StatTiles, Card, SpecBadge, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
+  StatTiles, Card, SpecBadge, CertSeal, ValueRotator, Accordion, Modal, refreshIcons, PageHeader,
 });
