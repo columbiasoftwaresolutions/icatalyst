@@ -170,15 +170,17 @@
    (set by JS, 0→1) grows, the detail column fades/slides in while the metric
    boxes slide from center to their side slot. --p defaults to 1 (all visible)
    for no-JS / reduced-motion. */
-.who-track { position: relative; height: 250vh; }
+.who-track { position: relative; height: 260vh; }
 .who-stage { position: sticky; top: 72px; min-height: calc(100vh - 120px); display: flex; align-items: center; padding: var(--space-4xl) 0; }
-.who-detail { opacity: var(--p, 1); transform: translateX(calc((1 - var(--p, 1)) * -30px)); }
-.who-boxes { transform-origin: center center; } /* transform driven by JS (centering) */
+.who-cols { position: relative; min-height: 420px; }
+.who-detail { width: 56%; opacity: var(--p, 1); }            /* width/opacity finalize via JS */
+.who-boxes { position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%); } /* width + left driven by JS */
 @media (max-width: 1000px) {
   .who-track { height: auto; }
   .who-stage { position: static; min-height: 0; padding: var(--space-3xl) 0 var(--space-section); }
-  .who-cols { grid-template-columns: 1fr !important; }
-  .who-detail, .who-boxes { opacity: 1 !important; transform: none !important; }
+  .who-cols { min-height: 0; }
+  .who-detail { width: auto; opacity: 1 !important; }
+  .who-boxes { position: static; top: auto; left: auto !important; width: auto !important; transform: none !important; margin-top: var(--space-3xl); }
 }
 @media (prefers-reduced-motion: reduce) {
   .who-detail, .who-boxes { opacity: 1 !important; transform: none !important; }

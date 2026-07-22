@@ -68,6 +68,7 @@ function WhoWeAre() {
   const stageRef = React.useRef(null);
   const colsRef = React.useRef(null);
   const boxesRef = React.useRef(null);
+  const detailRef = React.useRef(null);
   const rows = [
     { label: 'WHAT WE DO', body: IC.whoWeAre[0] },
     { label: 'CERTIFICATIONS & FRAMEWORK', body: IC.whoWeAre[1] },
@@ -83,25 +84,35 @@ function WhoWeAre() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp = (v) => Math.max(0, Math.min(1, v));
     const ease = (t) => t * t * (3 - 2 * t); // smoothstep
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const FINAL = 0.38;   // boxes' final width as a fraction of the row
+    const SHRINK = 0.42;  // p at which the width shrink completes
     const update = () => {
-      const cols = colsRef.current, boxes = boxesRef.current;
+      const cols = colsRef.current, boxes = boxesRef.current, detail = detailRef.current;
       if (!wide() || reduce) {
         stage.style.setProperty('--p', '1');
-        if (boxes) boxes.style.transform = '';
+        if (boxes) { boxes.style.width = ''; boxes.style.left = ''; boxes.style.transform = ''; }
+        if (detail) detail.style.opacity = '';
         return;
       }
       const rect = track.getBoundingClientRect();
       const total = track.offsetHeight - stage.offsetHeight;
-      const p = ease(total > 0 ? clamp((72 - rect.top) / total) : 1);
-      stage.style.setProperty('--p', p.toFixed(3));
-      // Center the boxes at p=0 (offset from their final right-column slot to the
-      // row centre), sliding to their slot at p=1.
-      if (cols && boxes) {
-        const offset = cols.offsetWidth / 2 - (boxes.offsetLeft + boxes.offsetWidth / 2);
-        const tx = (offset * (1 - p)).toFixed(1);
-        const sc = (1 + (1 - p) * 0.06).toFixed(3);
-        boxes.style.transform = `translateX(${tx}px) scale(${sc})`;
-      }
+      const p = total > 0 ? clamp((72 - rect.top) / total) : 1;
+      if (!cols || !boxes) return;
+      const W = cols.offsetWidth;
+      const finalW = W * FINAL;
+      // Phase 1 (0 → SHRINK): full-width bars shrink horizontally, staying centred.
+      // Phase 2 (SHRINK → 1): boxes slide from centre to the right; detail reveals.
+      const ph1 = ease(clamp(p / SHRINK));
+      const ph2 = ease(clamp((p - SHRINK) / (1 - SHRINK)));
+      const w = lerp(W, finalW, ph1);
+      const centerLeft = (W - w) / 2;
+      const rightLeft = W - finalW;
+      const left = lerp(centerLeft, rightLeft, ph2);
+      boxes.style.width = w.toFixed(1) + 'px';
+      boxes.style.left = left.toFixed(1) + 'px';
+      if (detail) detail.style.opacity = ph2.toFixed(3);
+      stage.style.setProperty('--p', ph2.toFixed(3));
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
@@ -120,9 +131,9 @@ function WhoWeAre() {
       <div ref={trackRef} className="who-track">
         <div ref={stageRef} className="who-stage" style={{ '--p': 1 }}>
           <Container>
-            <div ref={colsRef} className="who-cols" style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.25fr 0.75fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
+            <div ref={colsRef} className="who-cols">
               {/* LEFT — detail dropdowns, revealed by scroll progress */}
-              <div className="who-detail">
+              <div ref={detailRef} className="who-detail">
                 <div style={{ borderTop: '1px solid var(--hairline)' }}>
                   {rows.map((r) => <Accordion key={r.label} label={r.label}>{r.body}</Accordion>)}
                   <Accordion label="OUR PHILOSOPHY" meta="Innovation · Intelligence · Integrity">
