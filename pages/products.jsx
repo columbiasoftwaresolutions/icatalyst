@@ -99,6 +99,10 @@ function ProductDetail({ p }) {
 function App() {
   const [openId, setOpenId] = React.useState(null);
   React.useEffect(() => { refreshIcons(); });
+  React.useEffect(() => {
+    const h = (location.hash || '').replace('#', '');
+    if (h && IC.products.find(p => p.id === h)) setOpenId(h);
+  }, []);
   const open = IC.products.find(p => p.id === openId);
   return (
     <div style={{ background: 'var(--canvas)' }}>

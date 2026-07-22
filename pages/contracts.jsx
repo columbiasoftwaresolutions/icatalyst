@@ -29,10 +29,11 @@ function App() {
                     <span className="t-mono-label" style={{ color: 'var(--body)' }}>{c.name}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span className="t-mono-caption" style={{ color: 'var(--ink)' }}>CONTRACT #</span>
-                    <Tag>NUMBER TO BE PROVIDED</Tag>
+                    <span className="t-mono-caption" style={{ color: 'var(--body)' }}>CONTRACT #</span>
+                    <span className="t-mono-label" style={{ color: 'var(--accent-magenta)' }}>{c.number}</span>
                   </div>
-                  <Tag>DESCRIPTION TO BE PROVIDED</Tag>
+                  {c.meta && <span className="t-mono-caption" style={{ color: 'var(--body)' }}>{c.meta}</span>}
+                  <p className="t-body-md" style={{ color: 'var(--body)' }}>{c.desc}</p>
                 </div>
               </Card>
             </Reveal>
@@ -44,17 +45,19 @@ function App() {
       <Band dark>
         <Reveal>
           <Eyebrow dark>CUSTOMERS</Eyebrow>
-          <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>Who we serve</h2>
+          <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-lg)', maxWidth: 620 }}>Who we serve</h2>
+          <p className="t-body-lg" style={{ color: '#b9bcce', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>Trusted by federal agencies and mission partners across transportation, aviation, defense, and education.</p>
         </Reveal>
-        <Reveal delay={100}>
-          <div style={{ position: 'relative', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--hairline-on-dark)', overflow: 'hidden', minHeight: 220, display: 'grid', placeItems: 'center', padding: 'var(--space-3xl)' }}>
-            <div style={{ position: 'absolute', inset: 0, opacity: 0.55 }}><Motif variant="grid" /></div>
-            <div style={{ position: 'relative', textAlign: 'center', display: 'grid', gap: 'var(--space-md)', placeItems: 'center' }}>
-              <Tag dark>CUSTOMER LIST / LOGOS — TO BE PROVIDED</Tag>
-              <p className="t-body-md" style={{ color: '#b9bcce', maxWidth: 420 }}>Agency and commercial customer names and logos will appear here once supplied.</p>
-            </div>
-          </div>
-        </Reveal>
+        <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)' }}>
+          {IC.customers.map((name, i) => (
+            <Reveal key={name} delay={(i % 3) * 80}>
+              <div className="ic-lift ic-lift-dark" style={{ height: '100%', border: '1px solid var(--hairline-on-dark)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2xl)', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                <span style={{ width: 8, height: 8, borderRadius: 9999, background: 'var(--accent-periwinkle)', flex: 'none' }}></span>
+                <span className="t-body-md" style={{ color: 'var(--on-dark)' }}>{name}</span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </Band>
 
       {/* Partnerships — logo carousel */}

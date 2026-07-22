@@ -23,37 +23,44 @@ function App() {
         </div>
       </PageHeader>
 
-      {/* Capabilities */}
+      {/* Overview — why it matters */}
       <Band>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-lg)', flexWrap: 'wrap' }}>
-          <Eyebrow>CAPABILITIES</Eyebrow>
-          <Tag>DRAFT — CONFIRM CAPABILITY COPY</Tag>
+        <div className="two-grid" style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 'var(--space-5xl)', alignItems: 'start' }}>
+          <Reveal><Eyebrow>WHY IT MATTERS</Eyebrow></Reveal>
+          <Reveal delay={100}>
+            <p className="t-display-md" style={{ color: 'var(--ink)', fontWeight: 400 }}>{s.overview}</p>
+          </Reveal>
         </div>
-        <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', maxWidth: 620 }}>What this solution delivers</h2>
-        <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)', marginTop: 'var(--space-3xl)' }}>
-          {s.capabilities.map((c, i) => (
-            <Reveal key={c} delay={i * 80}>
-            <Card className="ic-lift ic-lift-light" style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'flex-start', height: '100%' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-magenta)', marginTop: 2 }}>{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <h4 className="t-body-lg-strong" style={{ color: 'var(--ink)' }}>{c}</h4>
-                <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 6 }}>
-                  <Tag>DESCRIPTION TO BE PROVIDED</Tag>
-                </p>
+      </Band>
+
+      {/* Expertise / capabilities */}
+      <Band dark>
+        <Reveal>
+          <Eyebrow dark>OUR EXPERTISE</Eyebrow>
+          <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', maxWidth: 620, marginBottom: 'var(--space-3xl)' }}>What this solution delivers</h2>
+        </Reveal>
+        <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)' }}>
+          {s.expertise.map((c, i) => (
+            <Reveal key={c.t} delay={(i % 3) * 80}>
+              <div className="ic-lift ic-lift-dark" style={{ height: '100%', border: '1px solid var(--hairline-on-dark)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2xl)' }}>
+                <span className="t-mono-label" style={{ color: 'var(--accent-periwinkle)' }}>{String(i + 1).padStart(2, '0')}</span>
+                <h4 className="t-body-lg-strong" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-sm)' }}>{c.t}</h4>
+                <p className="t-body-md" style={{ color: '#b9bcce', marginTop: 'var(--space-sm)' }}>{c.b}</p>
               </div>
-            </Card>
             </Reveal>
           ))}
         </div>
       </Band>
 
-      {/* Use cases */}
-      <Band dark>
-        <Eyebrow dark>USE CASES</Eyebrow>
-        <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', maxWidth: 620, marginBottom: 'var(--space-3xl)' }}>Where it makes an impact</h2>
-        <PlaceholderBlock dark note="USE CASES — TO BE PROVIDED">
-          Representative engagements, agency / industry contexts, and measurable outcomes for this solution area will appear here once supplied.
-        </PlaceholderBlock>
+      {/* Value proposition */}
+      <Band>
+        <Reveal>
+          <Eyebrow>THE OUTCOME</Eyebrow>
+          <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', maxWidth: 820 }}>{s.valueProp}</h2>
+          <div style={{ marginTop: 'var(--space-3xl)' }}>
+            <Pill variant="primary" href="contact.html">Discuss this solution</Pill>
+          </div>
+        </Reveal>
       </Band>
 
       {/* Back to all solutions */}

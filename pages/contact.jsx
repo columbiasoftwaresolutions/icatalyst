@@ -49,11 +49,7 @@ function ContactForm() {
           <i data-lucide="check" style={{ width: 24, height: 24, color: 'var(--ink)' }}></i>
         </span>
         <h3 className="t-display-md" style={{ color: 'var(--ink)' }}>Thank you, {form.name.split(' ')[0] || 'there'}.</h3>
-        <p className="t-body-md" style={{ color: 'var(--body)' }}>Your message has been received. A member of the iCatalyst team will be in touch shortly.</p>
-        <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
-          <span className="t-mono-caption" style={{ color: 'var(--ink)' }}>SUBMISSION DESTINATION</span>
-          <Tag>EMAIL / ENDPOINT TO BE PROVIDED</Tag>
-        </div>
+        <p className="t-body-md" style={{ color: 'var(--body)' }}>Your message has been received. A member of the iCatalyst team will be in touch shortly. You can also reach us directly at {IC.contact.email} or {IC.contact.phone}.</p>
         <Pill variant="outline" onClick={() => { setSent(false); setForm({ name: '', email: '', org: '', type: IC.inquiryTypes[0], message: '' }); }}>Send another</Pill>
       </Card>
     );
@@ -95,11 +91,17 @@ function ContactInfo() {
       <div>
         <Eyebrow>GENERAL CONTACT</Eyebrow>
         <div style={{ display: 'grid', gap: 'var(--space-md)', marginTop: 'var(--space-lg)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-            <i data-lucide="phone" style={{ width: 16, height: 16, color: 'var(--body)' }}></i><Tag>PHONE TO BE PROVIDED</Tag>
+          <a href={`tel:${IC.contact.phone.replace(/[^\d+]/g, '')}`} className="t-body-md" style={{ color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+            <i data-lucide="phone" style={{ width: 16, height: 16, color: 'var(--body)' }}></i>{IC.contact.phone}
+          </a>
+          <div className="t-body-md" style={{ color: 'var(--body)', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+            <i data-lucide="printer" style={{ width: 16, height: 16, color: 'var(--body)' }}></i>Fax {IC.contact.fax}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-            <i data-lucide="mail" style={{ width: 16, height: 16, color: 'var(--body)' }}></i><Tag>EMAIL TO BE PROVIDED</Tag>
+          <a href={`mailto:${IC.contact.email}`} className="t-body-md" style={{ color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+            <i data-lucide="mail" style={{ width: 16, height: 16, color: 'var(--body)' }}></i>{IC.contact.email}
+          </a>
+          <div className="t-body-md" style={{ color: 'var(--body)', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+            <i data-lucide="clock" style={{ width: 16, height: 16, color: 'var(--body)' }}></i>{IC.contact.hours}
           </div>
           <a href={IC.links.linkedin} target="_blank" rel="noopener" className="t-body-md" style={{ color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
             <i data-lucide="arrow-up-right" style={{ width: 16, height: 16, color: 'var(--body)' }}></i>LinkedIn

@@ -177,11 +177,9 @@ function HomeSolutions() {
             </Reveal>
           )}
           <Reveal delay={IC.solutions.length * 80} style={{ display: 'flex' }}>
-            <a href="solutions.html" className="sm-host" style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
-              <div className="ic-lift" style={{ height: '100%', width: '100%', borderRadius: 'var(--radius-sm)', background: 'var(--canvas-dark)', padding: 'var(--space-3xl) var(--space-2xl)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200, position: 'relative', overflow: 'hidden' }}>
-                <Eyebrow dark>ALL SOLUTIONS</Eyebrow>
-                <span className="t-display-md" style={{ color: 'var(--on-dark)', display: 'inline-flex', alignItems: 'center', gap: 10, position: 'relative' }}>Explore the full portfolio<i data-lucide="arrow-right" style={{ width: 22, height: 22 }}></i></span>
-              </div>
+            <a href="solutions.html" className="sm-host ic-card-link ic-ctacard">
+              <Eyebrow dark>ALL SOLUTIONS</Eyebrow>
+              <span className="t-display-md" style={{ color: 'var(--on-dark)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>Explore the full portfolio<i data-lucide="arrow-right" className="sol-arrow" style={{ width: 22, height: 22, transition: 'transform .2s ease' }}></i></span>
             </a>
           </Reveal>
         </div>
@@ -190,11 +188,8 @@ function HomeSolutions() {
 
 }
 
-/* Products — dark band, 3 cards. Header animation is tweakable (see Tweaks panel). */
-function HomeProducts({ t = {} }) {
-  const anim = t.productAnim || 'particles';
-  const scene = t.productScene || 'auto';
-  const intensity = t.productIntensity || 'bold';
+/* Products — dark band, 3 image cards (same style as solutions). */
+function HomeProducts() {
   return (
     <section style={{ background: 'var(--canvas-dark)' }} data-screen-label="Products">
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)' }}>
@@ -205,24 +200,7 @@ function HomeProducts({ t = {} }) {
         <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)', marginTop: 'var(--space-3xl)' }}>
           {IC.products.map((p, i) =>
           <Reveal key={p.id} delay={i * 90} style={{ display: 'flex' }}>
-              <a href={`products.html#${p.id}`} style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
-                <Card dark className="ic-lift ic-lift-dark" style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
-                  <div style={{ height: 110, position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--hairline-on-dark)', background: 'var(--canvas-dark)' }}>
-                    {anim === 'particles' &&
-                      <div style={{ position: 'absolute', inset: 0 }} key={`${scene}-${intensity}`}><Viz scene={scene === 'auto' ? IC.productScene[p.id] : scene} intensity={intensity} /></div>}
-                    {anim === 'diagram' &&
-                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', padding: '4px 0' }}><ProductViz id={p.id} /></div>}
-                    {anim === 'static' &&
-                      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(135% 150% at 80% 45%, rgba(42,82,201,0.32), rgba(1,1,32,0) 62%)' }}></div>}
-                    <span className="t-mono-label" style={{ position: 'absolute', top: 'var(--space-lg)', left: 'var(--space-2xl)', color: 'var(--accent-periwinkle)' }}>{p.no}</span>
-                  </div>
-                  <div style={{ padding: 'var(--space-2xl)', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <h3 className="t-display-md" style={{ color: 'var(--on-dark)' }}>{p.name}</h3>
-                    <p className="t-body-md" style={{ color: '#b9bcce', marginTop: 'var(--space-md)', flex: 1 }}>{p.tagline}</p>
-                    <span className="t-mono-button" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-lg)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>Learn more<i data-lucide="arrow-up-right" style={{ width: 16, height: 16 }}></i></span>
-                  </div>
-                </Card>
-              </a>
+              <ImageCard id={p.id} no={p.no} title={p.name.replace('iCatalyst ', '')} body={p.tagline} scene={IC.productScene[p.id]} href={`products.html#${p.id}`} />
             </Reveal>
           )}
         </div>
@@ -250,10 +228,7 @@ function HomeCTA() {
 }
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "heroVisual": "globe",
-  "productAnim": "particles",
-  "productScene": "auto",
-  "productIntensity": "bold"
+  "heroVisual": "globe"
 } /*EDITMODE-END*/;
 
 function App() {
@@ -266,7 +241,7 @@ function App() {
       <PartnerBar />
       <WhoWeAre />
       <HomeSolutions />
-      <HomeProducts t={t} />
+      <HomeProducts />
       <HomeCTA />
       <Footer />
       <ContactOrb />
@@ -275,18 +250,6 @@ function App() {
         <TweakRadio label="Visual" value={t.heroVisual}
         options={['flow', 'network', 'globe', 'accelerate']}
         onChange={(v) => setTweak('heroVisual', v)} />
-        <TweakSection label="Product cards" />
-        <TweakRadio label="Animation" value={t.productAnim || 'particles'}
-        options={['particles', 'static', 'diagram']}
-        onChange={(v) => setTweak('productAnim', v)} />
-        {(t.productAnim || 'particles') === 'particles' && <>
-          <TweakSelect label="Scene" value={t.productScene || 'auto'}
-          options={[{ value: 'auto', label: 'Per product' }, 'flow', 'network', 'globe', 'accelerate']}
-          onChange={(v) => setTweak('productScene', v)} />
-          <TweakRadio label="Intensity" value={t.productIntensity || 'bold'}
-          options={['subtle', 'medium', 'bold']}
-          onChange={(v) => setTweak('productIntensity', v)} />
-        </>}
       </TweaksPanel>
     </div>);
 

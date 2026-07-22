@@ -11,12 +11,7 @@ function StatBox({ n, label, tint }) {
 /* Careers — culture, open positions, benefits. With graphics + motion. */
 function App() {
   React.useEffect(() => { refreshIcons(); });
-  const benefits = [
-    { label: 'HEALTH & WELLNESS', body: 'Medical, dental, and vision coverage for you and your family, plus wellness support.' },
-    { label: 'RETIREMENT & FINANCIAL', body: 'Retirement savings with company contribution and financial-planning resources.' },
-    { label: 'TIME OFF & FLEXIBILITY', body: 'Generous paid time off, holidays, and flexible / hybrid work arrangements.' },
-    { label: 'LEARNING & DEVELOPMENT', body: 'Certifications, training stipends, and continuous-learning programs to grow your career.' },
-  ];
+  const benefits = IC.benefits;
   return (
     <div style={{ background: 'var(--canvas)' }}>
       <NavBar current="careers" />
@@ -41,11 +36,8 @@ function App() {
             <Eyebrow>OUR CULTURE</Eyebrow>
             <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', maxWidth: 560 }}>A culture of innovation, learning, and commitment</h2>
             <p className="t-body-lg" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)', maxWidth: 560 }}>
-              Our people stay because the work matters and the growth is real. We invest in continuous learning and reward a relentless focus on client outcomes.
+              We strive to offer a productive environment for professional growth, with an employee-focused approach as responsible leaders in business transformation and IT. Our people stay because the work matters and the growth is real.
             </p>
-            <div style={{ marginTop: 'var(--space-lg)' }}>
-              <Tag>ADDITIONAL CULTURE COPY — OPTIONAL, TO BE PROVIDED</Tag>
-            </div>
           </Reveal>
         </div>
       </Band>
@@ -57,11 +49,12 @@ function App() {
           <h2 className="t-display-lg" style={{ color: 'var(--on-dark)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>Current openings</h2>
         </Reveal>
         <Reveal delay={100}>
-          <div style={{ position: 'relative', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--hairline-on-dark)', overflow: 'hidden', minHeight: 200, display: 'grid', placeItems: 'center', padding: 'var(--space-3xl)' }}>
-            <div style={{ position: 'absolute', inset: 0, opacity: 0.5 }}><Motif variant="nodes" /></div>
-            <div style={{ position: 'relative', textAlign: 'center', display: 'grid', gap: 'var(--space-md)', placeItems: 'center' }}>
-              <Tag dark>OPEN ROLES — TO BE PROVIDED</Tag>
-              <p className="t-body-md" style={{ color: '#b9bcce', maxWidth: 460 }}>Each role will list title, department, location, a short description, and an apply link.</p>
+          <div style={{ position: 'relative', borderRadius: 'var(--radius-sm)', border: '1px solid var(--hairline-on-dark)', overflow: 'hidden', minHeight: 220, display: 'grid', placeItems: 'center', padding: 'var(--space-5xl) var(--space-3xl)' }}>
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.45 }}><Motif variant="nodes" /></div>
+            <div style={{ position: 'relative', textAlign: 'center', display: 'grid', gap: 'var(--space-lg)', placeItems: 'center', maxWidth: 520 }}>
+              <p className="t-display-md" style={{ color: 'var(--on-dark)' }}>Interested in joining iCatalyst?</p>
+              <p className="t-body-md" style={{ color: '#b9bcce' }}>For details on current openings, benefits, and plans, reach out through our contact form — we’d love to hear from you.</p>
+              <Pill variant="mint" href="contact.html">Contact us about roles</Pill>
             </div>
           </div>
         </Reveal>
@@ -72,8 +65,8 @@ function App() {
         <Reveal>
           <Eyebrow>BENEFITS</Eyebrow>
           <h2 className="t-display-lg" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)', marginBottom: 'var(--space-md)', maxWidth: 620 }}>What we offer</h2>
-          <p className="t-body-md" style={{ color: 'var(--body)', marginBottom: 'var(--space-3xl)' }}>
-            <Tag>FINAL BENEFITS COPY — TO BE PROVIDED</Tag>
+          <p className="t-body-lg" style={{ color: 'var(--body)', marginBottom: 'var(--space-3xl)', maxWidth: 620 }}>
+            A benefits package built around health, growth, flexibility, and community.
           </p>
         </Reveal>
         <Reveal delay={100}>

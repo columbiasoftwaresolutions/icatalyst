@@ -65,19 +65,66 @@ IC.philosophy = {
 IC.solutions = [
   { id: 'ai', no: '01', name: 'AI-Driven Digital Transformation',
     summary: 'Accelerate mission outcomes with AI/ML, RPA, and intelligent automation.',
-    capabilities: ['AI/ML model development', 'Robotic Process Automation (RPA)', 'Intelligent document processing', 'Predictive analytics', 'Process automation'] },
+    capabilities: ['AI/ML/NLP', 'RPA (UiPath, Appian, Pega)', 'Predictive analytics', 'Decision engines', 'Intelligent automation'],
+    overview: 'Federal agencies are prioritizing automation, intelligent decision-making, and mission acceleration. AI, machine learning, RPA, and advanced analytics let agencies modernize legacy processes, reduce burden, improve accuracy, and deliver services at scale.',
+    valueProp: 'Deliver faster, smarter, and more secure services by integrating AI, automation, cloud, and advanced analytics across your mission workflows.',
+    expertise: [
+      { t: 'End-to-End RPA Implementation', b: 'Assessment, design, development, testing, deployment, and ongoing optimization.' },
+      { t: 'AI-Integrated Automation', b: 'Solutions that combine RPA with machine learning and NLP for intelligent decisioning.' },
+      { t: 'Cloud-Native RPA', b: 'Scalable automation using modern, secure platforms and cloud-native architectures.' },
+      { t: 'Security-First Automation', b: 'Compliance, zero-trust principles, and federal-grade security embedded end-to-end.' },
+      { t: 'Rapid Delivery', b: 'Agile execution with measurable outcomes delivered in weeks, not months.' },
+    ] },
   { id: 'cloud', no: '02', name: 'Cloud & Infrastructure Modernization',
     summary: 'Migrate and secure workloads across AWS, Azure, and GCP with multi-cloud best practices.',
-    capabilities: ['Cloud migration', 'Multi-cloud architecture', 'Infrastructure-as-code', 'Security & compliance', 'Cost optimization'] },
+    capabilities: ['Cloud migration', 'Multi-cloud architecture', 'Cloud-native apps', 'FedRAMP / NIST', 'Cost optimization'],
+    overview: 'Agencies are under mandates to migrate to secure, scalable, and cost-effective cloud environments. iCatalyst delivers secure, intelligent, and seamless cloud transformation using leading platforms like AWS, Microsoft Azure, and Google Cloud Platform (GCP).',
+    valueProp: 'Achieve enhanced performance, scalability, cost-efficiency, and operational agility while reducing infrastructure expense and ensuring federal compliance.',
+    expertise: [
+      { t: 'Cloud Readiness & Migration', b: 'Readiness assessments, migration-candidate identification, and end-to-end migration with minimal disruption.' },
+      { t: 'Cost & ROI Modeling', b: 'Total cost of ownership and ROI modeling, with deployment strategy across IaaS, PaaS, and SaaS.' },
+      { t: 'Cloud-Native Architecture', b: 'Microservices, containers, and serverless architecture for modern, scalable workloads.' },
+      { t: 'Security & Compliance', b: 'Zero-trust, IAM, encryption, and continuous compliance (FedRAMP, NIST).' },
+      { t: 'Certified Engineers', b: 'Certified cloud engineers across AWS, Azure, and GCP, with AI/ML-accelerated assessment and planning.' },
+    ] },
   { id: 'data', no: '03', name: 'Data Engineering & Advanced Analytics',
     summary: 'Build data lakes/warehouses and deliver real-time, scalable, actionable insights.',
-    capabilities: ['Data lakes & warehouses', 'ETL / ELT pipelines', 'Real-time analytics', 'BI dashboards', 'Data governance'] },
+    capabilities: ['Data warehouses', 'Data lakes & streaming', 'Predictive modeling', 'Dashboards (Tableau, Power BI)', 'Data quality'],
+    overview: 'Agencies are managing massive data volumes and need real-time, actionable insights. iCatalyst turns billions of records into mission-critical intelligence with scalable, secure analytics platforms.',
+    valueProp: 'Turn billions of records into mission-critical intelligence with scalable, secure analytics platforms.',
+    expertise: [
+      { t: 'Data Warehousing', b: 'Large-scale warehouse solutions (PostgreSQL, Oracle, PostGIS), data lakes, and streaming analytics.' },
+      { t: 'Data Integration', b: 'Assess, extract, transform, and standardize disparate data sets from multiple source systems.' },
+      { t: 'Data Virtualization', b: 'Platforms like Denodo for governed self-service BI on integrated data.' },
+      { t: 'Data Quality', b: 'Apply rules of precedence and data-quality indices across sources.' },
+      { t: 'Visualization & Dashboards', b: 'Intuitive, interactive dashboards (Tableau, Power BI, Kibana) that support exploratory analysis.' },
+    ] },
   { id: 'it', no: '04', name: 'Enterprise IT Modernization & Custom Development',
     summary: 'Transform legacy systems with agile delivery, DevSecOps, and low/no-code platforms.',
-    capabilities: ['Legacy modernization', 'Custom software development', 'DevSecOps', 'Low/no-code (Appian, Pega)', 'Agile delivery'] },
+    capabilities: ['Legacy modernization', 'Agile dev (Java, Python, React)', 'DevSecOps & CI/CD', 'Low/no-code (Appian, Salesforce)', 'Geospatial'],
+    overview: 'Business agility is critical for federal and commercial organizations to stay competitive. iCatalyst develops AI-powered, secure, and scalable applications that automate complex workflows, enhance decision-making, and adapt rapidly to evolving demands.',
+    valueProp: 'AI-powered, secure, and scalable applications that automate complex workflows and adapt rapidly to evolving mission and market demands.',
+    expertise: [
+      { t: 'Client-Centric Development', b: 'User stories (Jira / Confluence) with iterative stakeholder engagement.' },
+      { t: 'Modular & Scalable Architecture', b: 'Microservices, containers (Docker, Kubernetes), and cloud-native patterns (AWS, Azure, GCP).' },
+      { t: 'DevOps & Agile Delivery', b: 'CI/CD, automated testing, and IaC (Terraform, Ansible) for faster releases.' },
+      { t: 'AI-Driven Automation', b: 'Embed AI/ML, NLP, RPA, and predictive analytics for intelligent, adaptive solutions.' },
+      { t: 'Geospatial Intelligence', b: 'Esri ArcGIS, QGIS, and Mapbox integrations for spatial visualization and analysis.' },
+      { t: 'Resilient & Secure Systems', b: 'Built-in fault isolation and strong security controls.' },
+    ] },
   { id: 'program', no: '05', name: 'Mission-Focused Program & Change Management',
     summary: 'Deliver complex programs with PMBOK-aligned execution, financial control, and training.',
-    capabilities: ['PMBOK-aligned program management', 'Financial control', 'Organizational change management', 'Training', 'Governance'] },
+    capabilities: ['PMBOK-aligned PM', 'Acquisition (CPIC, OMB MIBC)', 'Financial & quality mgmt', 'BPR & training', 'Performance management'],
+    overview: 'Large-scale programs demand disciplined execution, financial control, and stakeholder alignment. iCatalyst manages high-impact technology programs across AI/ML, IT modernization, cloud, and enterprise data — having saved clients over $10 million in operational and capital costs.',
+    valueProp: 'Disciplined, metrics-driven program delivery — saving clients multi-million-dollar operational and capital costs.',
+    expertise: [
+      { t: 'Acquisition & Investment Management', b: 'Full acquisition lifecycle using federal frameworks (CPIC, OMB MIBC) for funding and compliance.' },
+      { t: 'Program Artifact Development', b: 'Technical documentation including requirements and implementation roadmaps.' },
+      { t: 'Enterprise Data Management', b: 'Managing large-scale data warehouses (1B+ records) and high-throughput applications.' },
+      { t: 'Financial Management & Cost Control', b: 'EVM, forecasting, and cost-benefit analysis.' },
+      { t: 'Quality Management', b: 'ISO 9001:2015 practices and metrics-driven, performance-based management.' },
+      { t: 'Business Process Reengineering', b: 'Optimizing operations aligned with mission outcomes — training 600+ users in two weeks.' },
+    ] },
 ];
 
 IC.products = [
@@ -154,17 +201,36 @@ IC.products = [
 IC.certifications = [
   { code: 'ISO 9001:2015', name: 'Quality Management' },
   { code: 'ISO/IEC 27001:2022', name: 'Information Security' },
-  { code: 'CMMI ML 3 DEV', name: 'Maturity Level 3' },
+  { code: 'CMMI DEV/SVC ML3', name: 'Maturity Level 3' },
 ];
 
 IC.contractVehicles = [
-  { code: 'GSA MAS', name: 'Multiple Award Schedule' },
-  { code: 'GSA 8(a) STARS III', name: 'Governmentwide Acquisition Contract' },
-  { code: 'OASIS+', name: 'Professional Services' },
-  { code: 'FAA eFAST', name: 'Electronic FAST' },
+  { code: 'GSA MAS', name: 'Multiple Award Schedule',
+    number: '47QTCA21D00AE', meta: 'SIN 541515 · IT Professional Services',
+    desc: 'IT professional services and labor categories for database planning and design; systems analysis, integration, and design; and programming, conversion, and implementation support.' },
+  { code: 'GSA 8(a) STARS III', name: 'Governmentwide Acquisition Contract',
+    number: '47QTCB21D0157',
+    desc: 'Emerging technology-focused IT services, ancillary support, and ancillary telecommunications / wireless.' },
+  { code: 'OASIS+', name: 'Professional Services (SB & 8(a))',
+    number: '47QRCA25DSC05 · 47QRCA25DA117',
+    desc: 'Management & Advisory Services and Technical & Engineering Services, under both the Small Business and 8(a) pools.' },
+  { code: 'FAA eFAST', name: 'Electronic FAST',
+    number: 'MOA# DTFAWA11A-00217',
+    desc: 'Air transportation services, business administration & management, and computer / information systems development functional areas.' },
 ];
 
-IC.partners = ['Appian', 'Pega Systems', 'Salesforce', 'UiPath', 'Oracle', 'Adobe Sign', 'Amazon Web Services (AWS)'];
+/* Customers iCatalyst serves (from the live site). */
+IC.customers = [
+  'U.S. Department of Transportation (DOT)',
+  'Federal Aviation Administration (FAA)',
+  'National Transportation Safety Board (NTSB)',
+  'U.S. Air Force',
+  'U.S. Department of Education',
+  'Volpe — USDOT Volpe Center',
+  'Engility',
+];
+
+IC.partners = ['Appian', 'Pega Systems', 'Salesforce', 'UiPath', 'Oracle', 'Adobe Sign', 'Microsoft', 'Amazon Web Services (AWS)'];
 
 /* Technology partner logos. Drop real files into assets/partners/<file>,
    then set IC.partnersHaveLogos = true below to switch from wordmarks to images. */
@@ -176,7 +242,26 @@ IC.partnerLogos = [
   { id: 'uipath', name: 'UiPath', file: 'assets/partners/uipath-logo.png' },
   { id: 'oracle', name: 'Oracle', file: 'assets/partners/oracle-logo.png' },
   { id: 'adobe', name: 'Adobe', file: 'assets/partners/adobe-logo.png' },
+  { id: 'microsoft', name: 'Microsoft', file: 'assets/partners/microsoft-logo.png' },
   { id: 'aws', name: 'AWS', file: 'assets/partners/aws-logo.png', scale: 1.5 },
+];
+
+/* Contact details (from the live site). */
+IC.contact = {
+  phone: '(703) 942-5888',
+  fax: '(703) 348-3172',
+  email: 'info@icatalystinc.com',
+  hours: 'Monday–Friday · 8:00 AM – 5:00 PM ET',
+};
+
+/* Careers benefits (from the live site). Rendered as +/- accordions. */
+IC.benefits = [
+  { label: 'HEALTH & WELLNESS', body: 'Comprehensive health, vision, and dental insurance for eligible employees, plus an annual wellness reimbursement and paid time off.' },
+  { label: 'COMPENSATION', body: 'Competitive salaries, performance bonuses, and service awards recognizing exceptional work.' },
+  { label: 'CAREER DEVELOPMENT', body: 'Education assistance for job-related courses or certifications that are mutually beneficial, plus tuition reimbursement.' },
+  { label: 'WORK FLEXIBILITY', body: 'Flexible schedules and remote-work options; eligible employees are reimbursed for phone and internet used for company work.' },
+  { label: 'SOCIAL & COMMUNITY', body: 'Referral bonuses when friends and family join the team, social events that promote our culture, and sponsored community events — including Community Service Leave.' },
+  { label: 'PLANS & PROTECTION', body: '401(k), short-term disability, and life insurance round out the package.' },
 ];
 
 IC.offices = [
