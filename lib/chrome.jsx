@@ -1,5 +1,5 @@
 /* ============================================================================
-   iCatalyst — shared chrome: NavBar, Footer, WordmarkBanner, ContactOrb.
+   iCatalyst — shared chrome: NavBar, Footer, ContactOrb.
    ============================================================================ */
 
 /* Sticky nav. Dark over a dark header, flips to white once scrolled past it. */
@@ -65,23 +65,11 @@ function NavBar({ current }) {
   );
 }
 
-function WordmarkBanner() {
-  return (
-    <div style={{ overflow: 'hidden', lineHeight: 0, paddingBottom: 8 }}>
-      <div style={{
-        fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--hairline)',
-        fontSize: 'clamp(120px, 21vw, 300px)', lineHeight: .82, letterSpacing: '-0.05em',
-        textAlign: 'center', whiteSpace: 'nowrap',
-      }}>iCatalyst</div>
-    </div>
-  );
-}
-
-/* 4-column footer + offices + certifications + wordmark banner. */
+/* 4-column footer + offices + certifications. */
 function Footer() {
   const cols = {
     Company: [['Who We Are', 'index.html#who'], ['Contracts', 'contracts.html'], ['Careers', 'careers.html'], ['Contact', 'contact.html']],
-    Solutions: [['Overview', 'solutions.html'], ['AI-Driven Transformation', 'solution.html?id=ai'], ['Cloud Modernization', 'solution.html?id=cloud'], ['Data & Analytics', 'solution.html?id=data']],
+    Solutions: [['Overview', 'solutions.html'], ['AI-Driven Transformation', 'solution.html#ai'], ['Cloud Modernization', 'solution.html#cloud'], ['Data & Analytics', 'solution.html#data']],
     Products: [['Geospatial Engine', 'products.html#geospatial'], ['Semantic Intelligence', 'products.html#semantic'], ['Vendor-Agnostic AI Assistant', 'products.html#assistant']],
   };
   return (
@@ -136,7 +124,6 @@ function Footer() {
           </span>
         </div>
       </Container>
-      <WordmarkBanner />
     </footer>
   );
 }
@@ -162,4 +149,4 @@ function ContactOrb() {
   );
 }
 
-Object.assign(window, { NavBar, Footer, WordmarkBanner, ContactOrb });
+Object.assign(window, { NavBar, Footer, ContactOrb });

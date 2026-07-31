@@ -101,6 +101,7 @@
   display: flex; flex-direction: column; justify-content: space-between;
   width: 100%; height: 440px; padding: var(--space-3xl) var(--space-2xl);
   background: var(--canvas-dark); text-decoration: none; overflow: hidden;
+  outline: 1px solid var(--hairline-on-dark-translucent); outline-offset: -1px;
   clip-path: polygon(26px 0, 100% 0, 100% calc(100% - 26px), calc(100% - 26px) 100%, 0 100%, 0 26px);
 }
 .ic-ctacard.tall { height: 500px; }
@@ -175,24 +176,92 @@
 @keyframes ic-breathe { 0%,100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
 
 /* ---- Who We Are: scroll-locked reveal -------------------------------------
-   The track gives scroll budget; the stage pins (sticky) and centers. As --p
-   (set by JS, 0→1) grows, the detail column fades/slides in while the metric
-   boxes slide from center to their side slot. --p defaults to 1 (all visible)
-   for no-JS / reduced-motion. */
-.who-track { position: relative; height: 260vh; }
-.who-stage { position: sticky; top: 72px; min-height: calc(100vh - 120px); display: flex; align-items: center; padding: var(--space-4xl) 0; }
-.who-cols { position: relative; min-height: 420px; }
-.who-detail { width: 56%; opacity: var(--p, 1); }            /* width/opacity finalize via JS */
-.who-boxes { position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%); } /* width + left driven by JS */
+   The track gives scroll budget; the stage pins (sticky). The metric columns
+   first wipe in left→right — big, vertically centred, hairline-divided. Then,
+   driven by scroll, JS lerps each column's left/top so they glide (no reflow)
+   from that horizontal row into a vertical stack docked top-right, while the
+   section header and accordion detail fade in on the left. Divider hairlines
+   cross-fade (vertical ::before → horizontal ::after). Falls back to a plain
+   flow stack (.who-boxes--static / mobile) for no-JS / reduced-motion. */
+.who-track { position: relative; height: 150vh; }
+.who-stage { position: sticky; top: 64px; min-height: calc(100vh - 96px); display: flex; align-items: stretch; padding: var(--space-4xl) 0; }
+.who-cols { position: relative; flex: 1; min-height: calc(100vh - 220px); }
+.who-left { max-width: 52%; }
+.who-head { opacity: 0; }                          /* opacity driven by JS */
+.who-detail { opacity: 0; margin-top: var(--space-4xl); }  /* opacity driven by JS */
+.who-boxes { position: absolute; inset: 0; }
+
+/* Hero line — centred above the numbers on reveal; wipes in left→right, then
+   its opacity + top are driven by JS (fades out as the numbers start moving). */
+.who-hero {
+  position: absolute; top: 0; left: 0; width: 100%; text-align: center;
+  clip-path: inset(-12% 100% -12% 0);
+  transition: clip-path 1.35s cubic-bezier(.2,.6,.2,1);
+}
+.who-hero--in { clip-path: inset(-12% -2% -12% 0); }
+.who-hero__line { font-family: var(--font-display); font-weight: 500; font-size: clamp(40px, 3.8vw, 60px); line-height: 1.04; letter-spacing: -0.02em; }
+
+/* Metric column — absolutely positioned + placed by JS on desktop. Starts
+   clipped + nudged right; .who-boxes--revealed sweeps the wipe in left→right. */
+.who-metric {
+  position: absolute; box-sizing: border-box;
+  display: flex; flex-direction: column;
+  padding-left: var(--space-3xl);
+  clip-path: inset(-8% 100% -8% 0); transform: translateX(28px);
+  transition: clip-path 1.15s cubic-bezier(.2,.6,.2,1), transform 1.15s cubic-bezier(.2,.6,.2,1);
+}
+.who-metric:nth-child(2) { transition-delay: 190ms; }
+.who-metric:nth-child(3) { transition-delay: 380ms; }
+.who-metric:nth-child(4) { transition-delay: 570ms; }
+.who-boxes--revealed .who-metric { clip-path: inset(-8% -2% -8% 0); transform: translateX(0); }
+
+/* Divider hairlines: vertical (row state) cross-fades to horizontal (stack). */
+.who-metric::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--hairline); opacity: var(--vdiv, 1); }
+.who-metric::after  { content: ''; position: absolute; left: 0; right: 0; top: -11px; height: 1px; background: var(--hairline); opacity: var(--hdiv, 0); }
+
+.who-metric__top { display: block; color: var(--ink); font-size: 18px; }
+.who-metric__num { display: block; color: var(--ink); font-size: clamp(50px, 4.8vw, 84px); line-height: 1; letter-spacing: -0.03em; margin: var(--space-md) 0; }
+.who-metric__cap { display: block; color: var(--body); }
+
+/* Fallback — plain vertical flow stack (no-JS / reduced-motion / mobile). */
+.who-boxes--static { position: static; inset: auto; display: flex; flex-direction: column; gap: var(--space-2xl); }
+.who-boxes--static .who-metric { position: static; clip-path: none; transform: none; padding: var(--space-lg) 0 0 0; }
+.who-boxes--static .who-metric::before { opacity: 0; }
+.who-boxes--static .who-metric::after  { opacity: 1; }
+.who-boxes--static .who-metric:first-child::after { opacity: 0; }
+
 @media (max-width: 1000px) {
   .who-track { height: auto; }
   .who-stage { position: static; min-height: 0; padding: var(--space-3xl) 0 var(--space-section); }
-  .who-cols { min-height: 0; }
-  .who-detail { width: auto; opacity: 1 !important; }
-  .who-boxes { position: static; top: auto; left: auto !important; width: auto !important; transform: none !important; margin-top: var(--space-3xl); }
+  .who-cols { min-height: 0; display: flex; flex-direction: column; gap: var(--space-3xl); }
+  .who-hero { display: none; }
+  .who-left { max-width: none; }
+  .who-head, .who-detail { opacity: 1 !important; margin-top: 0; }
+  .who-boxes { position: static; inset: auto; display: flex; flex-direction: column; gap: var(--space-2xl); }
+  .who-metric { position: static; clip-path: none; transform: none; padding: var(--space-lg) 0 0 0; }
+  .who-metric::before { opacity: 0; }
+  .who-metric::after { opacity: 1; }
+  .who-metric:first-child::after { opacity: 0; }
+  .who-metric__num { font-size: clamp(44px, 12vw, 64px); }
 }
+
+/* PageHeader's graphicScale bleed (lib/ui.jsx) is sized as a percentage
+   overlay of its own 1-row grid cell so it can grow past that cell without
+   affecting the hero band's height. That's safe on desktop, where the
+   graphic shares a row with the (taller) text column. Below 1000px `.hero-grid`
+   collapses to a single stacked column (see each page's own inline <style>),
+   so the graphic becomes its own short row directly under the text — and the
+   same percentage bleed then reaches upward past its row into the text
+   column above it (e.g. clipping the hero button row). Neutralize the bleed
+   at that breakpoint so the graphic just fills its own cell instead. */
+@media (max-width: 1000px) {
+  .hero-graphic-bleed { position: static !important; width: 100% !important; height: 100% !important; transform: none !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .who-detail, .who-boxes { opacity: 1 !important; transform: none !important; }
+  .who-hero { display: none; }
+  .who-head, .who-detail { opacity: 1 !important; }
+  .who-metric { clip-path: none !important; transform: none !important; }
 }
 
 /* ---- Type-out caret -------------------------------------------------------- */

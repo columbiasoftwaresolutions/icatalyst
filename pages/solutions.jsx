@@ -9,7 +9,9 @@ function App() {
         title="Five core solution areas for federal and commercial missions"
         lead="iCatalyst delivers five core solution areas spanning AI, cloud, data, enterprise IT, and program management for federal and commercial missions."
         breadcrumb={[{ label: 'Home', href: 'index.html' }, { label: 'Solutions' }]}
-        graphic="network"
+        graphic="morph"
+        graphicHeight={420}
+        graphicCols="1.1fr 0.9fr"
       />
 
       <Band>

@@ -9,7 +9,8 @@ function App() {
         title="Streamlined federal access through trusted contract vehicles"
         lead="iCatalyst provides streamlined access to cutting-edge technologies through trusted federal contract vehicles, alongside an ecosystem of customers and technology partners."
         breadcrumb={[{ label: 'Home', href: 'index.html' }, { label: 'Contracts' }]}
-        graphic="flow"
+        graphic="contracts-morph"
+        graphicScale={1.5}
       />
 
       {/* Contract vehicles */}

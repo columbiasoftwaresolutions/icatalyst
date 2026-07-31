@@ -47,15 +47,17 @@ function PartnerBar() {
 
 }
 
-/* Metric tile — big count-up number + label. */
-function MetricTile({ m, tint }) {
+/* Metric column — Indra-style three-tier: category label above, big count-up
+   number, caption below. The wrapping .who-metric supplies the divider + layout. */
+function MetricTile({ m }) {
   return (
-    <div className="ic-lift" style={{ background: tint, borderRadius: 'var(--radius-sm)', padding: 'var(--space-2xl)' }}>
-      <span className="t-display-xl" style={{ color: 'var(--ink)', fontFeatureSettings: '"tnum"' }}>
+    <React.Fragment>
+      <span className="t-body-md who-metric__top">{m.top}</span>
+      <span className="t-display-xl who-metric__num" style={{ fontFeatureSettings: '"tnum"' }}>
         <CountUp to={parseFloat(m.num)} prefix={m.pre} suffix={m.suf} />
       </span>
-      <span className="t-body-md" style={{ color: 'var(--ink)', opacity: .72, display: 'block', marginTop: 'var(--space-sm)' }}>{m.l}</span>
-    </div>
+      <span className="t-body-md who-metric__cap">{m.l}</span>
+    </React.Fragment>
   );
 }
 
@@ -69,52 +71,90 @@ function WhoWeAre() {
   const colsRef = React.useRef(null);
   const boxesRef = React.useRef(null);
   const detailRef = React.useRef(null);
+  const headRef = React.useRef(null);
+  const heroRef = React.useRef(null);
   const rows = [
     { label: 'WHAT WE DO', body: IC.whoWeAre[0] },
     { label: 'CERTIFICATIONS & FRAMEWORK', body: IC.whoWeAre[1] },
     { label: 'CONTRACT VEHICLES & PARTNERS', body: IC.whoWeAre[2] },
     { label: 'OUR PEOPLE', body: IC.whoWeAre[3] },
   ];
-  const tints = ['var(--accent-mint)', 'var(--accent-periwinkle)', 'var(--accent-mint)'];
 
   React.useEffect(() => {
-    const track = trackRef.current, stage = stageRef.current;
-    if (!track || !stage) return;
+    const track = trackRef.current, stage = stageRef.current, boxes = boxesRef.current;
+    if (!track || !stage || !boxes) return;
     const wide = () => window.innerWidth >= 1001;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp = (v) => Math.max(0, Math.min(1, v));
     const ease = (t) => t * t * (3 - 2 * t); // smoothstep
     const lerp = (a, b, t) => a + (b - a) * t;
-    const FINAL = 0.38;   // boxes' final width as a fraction of the row
-    const SHRINK = 0.42;  // p at which the width shrink completes
+    const HOLD = 0.06;   // reveal holds (hero + numbers wiped in) before docking
+    const MID  = 0.5;    // numbers finish docking into the top-right stack
+    const DONE = 0.9;    // detail finishes right before the pin releases (no dead tail)
+    const GAP  = 22;     // vertical gap between docked metrics
+    const HERO_GAP = 150; // vertical offset from hero top to the numbers row on reveal
+    let revealed = false;
+    const doReveal = () => { revealed = true; boxes.classList.add('who-boxes--revealed'); if (heroRef.current) heroRef.current.classList.add('who-hero--in'); };
+
+    const clearInline = () => {
+      for (const el of boxes.children) { el.style.left = el.style.top = el.style.width = ''; el.style.removeProperty('--vdiv'); el.style.removeProperty('--hdiv'); }
+    };
+
     const update = () => {
-      const cols = colsRef.current, boxes = boxesRef.current, detail = detailRef.current;
+      const cols = colsRef.current, detail = detailRef.current, head = headRef.current, hero = heroRef.current;
       if (!wide() || reduce) {
+        boxes.classList.add('who-boxes--static');
+        clearInline();
         stage.style.setProperty('--p', '1');
-        if (boxes) { boxes.style.width = ''; boxes.style.left = ''; boxes.style.transform = ''; }
         if (detail) detail.style.opacity = '';
+        if (head) head.style.opacity = '';
+        if (hero) { hero.style.opacity = ''; hero.style.top = ''; }
         return;
       }
+      boxes.classList.remove('who-boxes--static');
       const rect = track.getBoundingClientRect();
       const total = track.offsetHeight - stage.offsetHeight;
       const p = total > 0 ? clamp((72 - rect.top) / total) : 1;
-      if (!cols || !boxes) return;
+      if (!cols) return;
+      // Each column glides on a continuous path (no reflow / flip): JS lerps its
+      // left & top from the horizontal, centred row into a vertical stack docked
+      // top-right. Divider hairlines cross-fade (vertical → horizontal). Above
+      // the row a hero line is centred; it fades out the moment the numbers move,
+      // then the regular header + accordion detail fade in.
+      const N = boxes.children.length;
       const W = cols.offsetWidth;
-      const finalW = W * FINAL;
-      // Phase 1 (0 → SHRINK): full-width bars shrink horizontally, staying centred.
-      // Phase 2 (SHRINK → 1): boxes slide from centre to the right; detail reveals.
-      const ph1 = ease(clamp(p / SHRINK));
-      const ph2 = ease(clamp((p - SHRINK) / (1 - SHRINK)));
-      const w = lerp(W, finalW, ph1);
-      const centerLeft = (W - w) / 2;
-      const rightLeft = W - finalW;
-      const left = lerp(centerLeft, rightLeft, ph2);
-      boxes.style.width = w.toFixed(1) + 'px';
-      boxes.style.left = left.toFixed(1) + 'px';
-      if (detail) detail.style.opacity = ph2.toFixed(3);
-      stage.style.setProperty('--p', ph2.toFixed(3));
+      const colW = W / N;
+      let rowH = 0;
+      for (const el of boxes.children) el.style.width = colW + 'px';
+      for (const el of boxes.children) rowH = Math.max(rowH, el.offsetHeight);
+      const q1     = ease(clamp((p - HOLD) / (MID - HOLD)));         // numbers row → stack
+      const heroO  = 1 - ease(clamp((p - HOLD) / (0.20 - HOLD)));    // hero fades as they move
+      const hd     = ease(clamp((p - 0.52) / (0.72 - 0.52)));        // regular header fades in
+      const q2     = ease(clamp((p - MID) / (DONE - MID)));          // accordion detail
+      // Reveal group (hero above, numbers below) sits vertically centred.
+      const groupH = HERO_GAP + rowH;
+      const heroY = Math.max(20, (cols.offsetHeight - groupH) / 2);
+      const numbersY = heroY + HERO_GAP;
+      // Fire the wipe only once the numbers have actually scrolled into view
+      // (like the count-up) — not while the section is barely peeking in.
+      if (!revealed && cols.getBoundingClientRect().top + numbersY < window.innerHeight * 0.85) doReveal();
+      const step = rowH + GAP;
+      for (let i = 0; i < N; i++) {
+        const el = boxes.children[i];
+        el.style.left = lerp(i * colW, (N - 1) * colW, q1).toFixed(1) + 'px';
+        el.style.top  = lerp(numbersY, i * step, q1).toFixed(1) + 'px';
+        el.style.setProperty('--vdiv', (1 - q1).toFixed(3));
+        el.style.setProperty('--hdiv', (i === 0 ? 0 : q1).toFixed(3));
+      }
+      if (hero) { hero.style.top = heroY.toFixed(1) + 'px'; hero.style.opacity = heroO.toFixed(3); }
+      if (head) head.style.opacity = hd.toFixed(3);
+      if (detail) detail.style.opacity = q2.toFixed(3);
+      stage.style.setProperty('--p', q2.toFixed(3));
     };
+    // Reduced-motion: skip the wipe entirely (CSS just shows everything).
+    if (reduce) doReveal();
     update();
+
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     return () => { window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
@@ -122,36 +162,46 @@ function WhoWeAre() {
 
   return (
     <section id="who" style={{ background: 'var(--canvas)', scrollMarginTop: 80 }} data-screen-label="Who We Are">
-      <Container style={{ paddingTop: 'var(--space-section)' }}>
-        <Eyebrow>WHO WE ARE</Eyebrow>
-        <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: 760 }}
-          text="A trusted technology partner for mission-critical work" loop={false} onView={false} caretColor="var(--accent-magenta)" />
-      </Container>
-
       <div ref={trackRef} className="who-track">
         <div ref={stageRef} className="who-stage" style={{ '--p': 1 }}>
           <Container>
             <div ref={colsRef} className="who-cols">
-              {/* LEFT — detail dropdowns, revealed by scroll progress */}
-              <div ref={detailRef} className="who-detail">
-                <div style={{ borderTop: '1px solid var(--hairline)' }}>
-                  {rows.map((r) => <Accordion key={r.label} label={r.label}>{r.body}</Accordion>)}
-                  <Accordion label="OUR PHILOSOPHY" meta="Innovation · Intelligence · Integrity">
-                    <p className="t-body-md" style={{ color: 'var(--body)', maxWidth: 720 }}>{IC.philosophy.intro[0]}</p>
-                    <div style={{ borderTop: '1px solid var(--hairline)', marginTop: 'var(--space-lg)' }}>
-                      {IC.philosophy.values.map((v) => <Accordion key={v.e} label={v.e} sub>{v.b}</Accordion>)}
-                    </div>
-                    <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>{IC.philosophy.closing}</p>
-                  </Accordion>
+              {/* Hero line — wipes in above the numbers, then fades as they move */}
+              <div ref={heroRef} className="who-hero">
+                <Eyebrow>BY THE NUMBERS</Eyebrow>
+                <div className="who-hero__line" style={{ color: 'var(--ink)', marginTop: 'var(--space-md)' }}>Proven where it matters most</div>
+              </div>
+              {/* LEFT — section header + accordion, fade in once the metrics dock */}
+              <div className="who-left">
+                <div ref={headRef} className="who-head">
+                  <Eyebrow>WHO WE ARE</Eyebrow>
+                  <h2 className="t-display-xl" style={{ color: 'var(--ink)', marginTop: 'var(--space-lg)', maxWidth: 560 }}>
+                    A trusted technology partner for mission-critical work
+                  </h2>
                 </div>
-                <div style={{ display: 'flex', gap: 'var(--space-2xl)', flexWrap: 'wrap', marginTop: 'var(--space-2xl)' }}>
-                  <ArrowLink href="solutions.html">Our solutions</ArrowLink>
-                  <ArrowLink href="contracts.html">Contracts &amp; certifications</ArrowLink>
+                <div ref={detailRef} className="who-detail">
+                  <div style={{ borderTop: '1px solid var(--hairline)' }}>
+                    {rows.map((r) => <Accordion key={r.label} label={r.label}>{r.body}</Accordion>)}
+                    <Accordion label="OUR PHILOSOPHY" meta="Innovation · Intelligence · Integrity">
+                      <p className="t-body-md" style={{ color: 'var(--body)', maxWidth: 720 }}>{IC.philosophy.intro[0]}</p>
+                      <div style={{ borderTop: '1px solid var(--hairline)', marginTop: 'var(--space-lg)' }}>
+                        {IC.philosophy.values.map((v) => <Accordion key={v.e} label={v.e} sub>{v.b}</Accordion>)}
+                      </div>
+                      <p className="t-body-md" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>{IC.philosophy.closing}</p>
+                    </Accordion>
+                  </div>
+                  <div style={{ display: 'flex', gap: 'var(--space-2xl)', flexWrap: 'wrap', marginTop: 'var(--space-2xl)' }}>
+                    <ArrowLink href="solutions.html">Our solutions</ArrowLink>
+                    <ArrowLink href="contracts.html">Contracts &amp; certifications</ArrowLink>
+                  </div>
                 </div>
               </div>
-              {/* RIGHT — metric tiles: prominent, then slide aside */}
-              <div ref={boxesRef} className="who-boxes" style={{ display: 'grid', gap: 'var(--space-lg)' }}>
-                {IC.metrics.map((m, i) => <MetricTile key={m.l} m={m} tint={tints[i % tints.length]} />)}
+              {/* RIGHT (overlay) — metric columns wipe in left→right, count up, then
+                  glide from the centred horizontal row into the top-right stack. */}
+              <div ref={boxesRef} className="who-boxes">
+                {IC.metrics.map((m) =>
+                <div key={m.l} className="who-metric"><MetricTile m={m} /></div>
+                )}
               </div>
             </div>
           </Container>
@@ -164,19 +214,19 @@ function WhoWeAre() {
 /* Solutions — 5 image-led cards (shared SolutionCard) + a dark "view all" tile. */
 function HomeSolutions() {
   return (
-    <section style={{ background: 'var(--canvas)' }} data-screen-label="Solutions">
+    <section style={{ background: 'var(--canvas-dark)' }} data-screen-label="Solutions">
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 'var(--space-lg)' }}>
-          <SectionHead eyebrow="SOLUTIONS" title="Five core solution areas" />
-          <Pill variant="outline" href="solutions.html">View all</Pill>
+          <SectionHead dark eyebrow="SOLUTIONS" title="Five core solution areas" />
+          <Pill variant="ghost" href="solutions.html">View all</Pill>
         </div>
         <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)', marginTop: 'var(--space-3xl)' }}>
           {IC.solutions.map((s, i) =>
-          <Reveal key={s.id} delay={i * 80} style={{ display: 'flex' }}>
+          <Reveal key={s.id} delay={(i % 3) * 60} style={{ display: 'flex' }}>
               <SolutionCard s={s} />
             </Reveal>
           )}
-          <Reveal delay={IC.solutions.length * 80} style={{ display: 'flex' }}>
+          <Reveal delay={(IC.solutions.length % 3) * 60} style={{ display: 'flex' }}>
             <a href="solutions.html" className="sm-host ic-card-link ic-ctacard">
               <Eyebrow dark>ALL SOLUTIONS</Eyebrow>
               <span className="t-display-md" style={{ color: 'var(--on-dark)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>Explore the full portfolio<i data-lucide="arrow-right" className="sol-arrow" style={{ width: 22, height: 22, transition: 'transform .2s ease' }}></i></span>
@@ -191,11 +241,11 @@ function HomeSolutions() {
 /* Products — dark band, 3 image cards (same style as solutions). */
 function HomeProducts() {
   return (
-    <section style={{ background: 'var(--canvas-dark)' }} data-screen-label="Products">
+    <section style={{ background: 'var(--canvas)' }} data-screen-label="Products">
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 'var(--space-lg)' }}>
-          <SectionHead dark eyebrow="PRODUCTS" title="Purpose-built AI products" />
-          <Pill variant="ghost" href="products.html">View all</Pill>
+          <SectionHead eyebrow="PRODUCTS" title="Purpose-built AI products" />
+          <Pill variant="outline" href="products.html">View all</Pill>
         </div>
         <div className="three-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--space-lg)', marginTop: 'var(--space-3xl)' }}>
           {IC.products.map((p, i) =>
@@ -209,18 +259,15 @@ function HomeProducts() {
 
 }
 
-/* Closing CTA — white band. */
-function HomeCTA() {
+/* Closing band — dark, minimal: eyebrow + the two CTAs, near the bottom. */
+function HomeClose() {
   return (
-    <section style={{ background: 'var(--canvas)', borderTop: '1px solid var(--hairline)' }}>
+    <section style={{ background: 'var(--canvas-dark)' }}>
       <Container style={{ paddingTop: 'var(--space-section)', paddingBottom: 'var(--space-section)', textAlign: 'center' }}>
-        <Eyebrow style={{ textAlign: 'center' }}>ACCELERATING YOUR SUCCESS</Eyebrow>
-        <TypeOut as="h2" className="t-display-xl" style={{ color: 'var(--ink)', maxWidth: 680, margin: 'var(--space-lg) auto 0' }}
-          text="Let’s accelerate your mission" loop={false} onView={false} caretColor="var(--accent-magenta)" />
-        <p className="t-body-lg" style={{ color: 'var(--body)', marginTop: 'var(--space-lg)' }}>Innovation. Intelligence. Integrity.</p>
-        <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', marginTop: 'var(--space-2xl)', flexWrap: 'wrap' }}>
-          <Pill variant="primary" href="contact.html">Contact us</Pill>
-          <Pill variant="outline" href="solutions.html">Explore solutions</Pill>
+        <Eyebrow dark style={{ textAlign: 'center' }}>ACCELERATING YOUR SUCCESS</Eyebrow>
+        <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', marginTop: 'var(--space-xl)', flexWrap: 'wrap' }}>
+          <Pill variant="mint" href="contact.html">Contact us</Pill>
+          <Pill variant="ghost" href="solutions.html">Explore solutions</Pill>
         </div>
       </Container>
     </section>);
@@ -242,7 +289,7 @@ function App() {
       <WhoWeAre />
       <HomeSolutions />
       <HomeProducts />
-      <HomeCTA />
+      <HomeClose />
       <Footer />
       <ContactOrb />
       <TweaksPanel title="Tweaks">

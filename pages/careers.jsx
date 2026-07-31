@@ -20,7 +20,8 @@ function App() {
         title="Build a career where your work accelerates the mission"
         lead="With an over 90% employee retention rate over the past five years, our success is driven by a culture of innovation, continuous learning, and a deep commitment to client outcomes."
         breadcrumb={[{ label: 'Home', href: 'index.html' }, { label: 'Careers' }]}
-        graphic="flow"
+        graphic="careers-morph"
+        graphicScale={1.5}
       />
 
       {/* Culture + retention stats */}

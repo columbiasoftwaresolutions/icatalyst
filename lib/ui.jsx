@@ -287,7 +287,7 @@ function ImageCard({ id, no, title, body, scene, href, onClick, tall }) {
 
 /* Solution card — image card that links to the detail page. */
 function SolutionCard({ s }) {
-  return <ImageCard id={s.id} no={s.no} title={s.name} body={s.summary} scene={(window.IC && IC.solutionScene[s.id]) || 'network'} href={`solution.html?id=${s.id}`} />;
+  return <ImageCard id={s.id} no={s.no} title={s.name} body={s.summary} scene={(window.IC && IC.solutionScene[s.id]) || 'network'} href={`solution.html#${s.id}`} />;
 }
 
 /* Technology-partner marquee — grayscale logo carousel, label above. Shared. */
@@ -360,7 +360,7 @@ function Modal({ open, onClose, eyebrow, title, children, maxWidth = 760 }) {
 function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
 
 /* Dark hero band for inner pages — keeps the nav scroll-flip rhythm consistent. */
-function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
+function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic, graphicHeight = 300, graphicCols = '1.2fr 0.8fr', graphicScale = 1 }) {
   const text = (
     <div>
       {breadcrumb && (
@@ -383,10 +383,20 @@ function PageHeader({ eyebrow, title, lead, breadcrumb, children, graphic }) {
     <section style={{ background: 'var(--canvas-dark)', color: 'var(--on-dark)', position: 'relative', overflow: 'hidden' }} data-screen-label={title}>
       <Container style={{ paddingTop: 'var(--space-5xl)', paddingBottom: 'var(--space-section)' }}>
         {graphic ? (
-          <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 'var(--space-5xl)', alignItems: 'center' }}>
-            <Reveal>{text}</Reveal>
-            <Reveal delay={120} style={{ height: 300 }}>
-              <Viz scene={graphic} intensity="bold" />
+          <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: graphicCols, gap: 'var(--space-5xl)', alignItems: 'center' }}>
+            <Reveal style={{ position: 'relative', zIndex: 1 }}>{text}</Reveal>
+            <Reveal delay={120} style={{ height: graphicHeight, position: 'relative', zIndex: 0 }}>
+              {graphicScale === 1 ? (
+                <Viz scene={graphic} intensity="bold" />
+              ) : (
+                <div className="hero-graphic-bleed" style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  width: `${graphicScale * 100}%`, height: `${graphicScale * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}>
+                  <Viz scene={graphic} intensity="bold" />
+                </div>
+              )}
             </Reveal>
           </div>
         ) : (

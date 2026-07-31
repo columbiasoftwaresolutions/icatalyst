@@ -112,7 +112,10 @@ function App() {
         title="Purpose-built AI products for complex environments"
         lead="Custom, secure, cloud-based platforms that turn complex and unstructured data into mission outcomes — from geospatial analytics to semantic intelligence and domain-specific AI assistants."
         breadcrumb={[{ label: 'Home', href: 'index.html' }, { label: 'Products' }]}
-        graphic="network"
+        graphic="products-morph"
+        graphicHeight={380}
+        graphicCols="1.15fr 0.85fr"
+        graphicScale={1.6}
       />
 
       <Band>

@@ -42,10 +42,12 @@ IC.whoWeAre = [
   'With an over 90% employee retention rate over the past five years, our success is driven by a culture of innovation, continuous learning, and a deep commitment to client outcomes.',
 ];
 
+/* top = category label (Indra-style, shown above the number); l = caption below. */
 IC.metrics = [
-  { pre: '', num: '19', suf: '+', l: 'Years delivering since 2007' },
-  { pre: '', num: '90', suf: '%', l: 'Employee retention, past 5 years' },
-  { pre: '', num: '4', suf: '', l: 'Federal contract vehicles' },
+  { top: 'Track record', pre: '', num: '19', suf: '+', l: 'Years delivering since 2007' },
+  { top: 'Our people', pre: '', num: '90', suf: '%', l: 'Employee retention, past 5 years' },
+  { top: 'Federal access', pre: '', num: '4', suf: '', l: 'Contract vehicles held' },
+  { top: 'Portfolio', pre: '$', num: '80', suf: 'M+', l: 'Contracts under management' },
 ];
 
 IC.philosophy = {
@@ -74,6 +76,13 @@ IC.solutions = [
       { t: 'Cloud-Native RPA', b: 'Scalable automation using modern, secure platforms and cloud-native architectures.' },
       { t: 'Security-First Automation', b: 'Compliance, zero-trust principles, and federal-grade security embedded end-to-end.' },
       { t: 'Rapid Delivery', b: 'Agile execution with measurable outcomes delivered in weeks, not months.' },
+    ],
+    advantage: [
+      { t: 'Proven Track Record', b: 'Successful AI + automation delivery across federal programs.' },
+      { t: 'Certified RPA Experts', b: 'UiPath, Appian, and Pega certified practitioners.' },
+      { t: 'Ease of Use & Maintenance', b: 'Low-code workflows, transparent documentation, and scalable architectures.' },
+      { t: 'Cloud & Hybrid Flexibility', b: 'Deployments tailored to AWS GovCloud, Azure Gov, hybrid, and on-prem environments.' },
+      { t: 'Secure & Compliant', b: 'Built to meet FISMA, NIST SP 800-53, FedRAMP, RMF, and Zero Trust directives.' },
     ] },
   { id: 'cloud', no: '02', name: 'Cloud & Infrastructure Modernization',
     summary: 'Migrate and secure workloads across AWS, Azure, and GCP with multi-cloud best practices.',
@@ -86,6 +95,12 @@ IC.solutions = [
       { t: 'Cloud-Native Architecture', b: 'Microservices, containers, and serverless architecture for modern, scalable workloads.' },
       { t: 'Security & Compliance', b: 'Zero-trust, IAM, encryption, and continuous compliance (FedRAMP, NIST).' },
       { t: 'Certified Engineers', b: 'Certified cloud engineers across AWS, Azure, and GCP, with AI/ML-accelerated assessment and planning.' },
+    ],
+    advantage: [
+      { t: 'Certified Cloud Experts', b: 'AWS, Azure, and GCP engineers with secure, scalable deployments.' },
+      { t: 'AI-Driven Cloud Strategy', b: 'AI/ML to accelerate assessments and migration paths.' },
+      { t: 'Legacy Modernization', b: 'Transform outdated systems into resilient cloud platforms.' },
+      { t: 'Cost Optimization', b: 'Reduce waste, improve utilization, maximize ROI.' },
     ] },
   { id: 'data', no: '03', name: 'Data Engineering & Advanced Analytics',
     summary: 'Build data lakes/warehouses and deliver real-time, scalable, actionable insights.',
@@ -98,6 +113,12 @@ IC.solutions = [
       { t: 'Data Virtualization', b: 'Platforms like Denodo for governed self-service BI on integrated data.' },
       { t: 'Data Quality', b: 'Apply rules of precedence and data-quality indices across sources.' },
       { t: 'Visualization & Dashboards', b: 'Intuitive, interactive dashboards (Tableau, Power BI, Kibana) that support exploratory analysis.' },
+    ],
+    advantage: [
+      { t: 'Skilled Workforce', b: 'Experts across data types, pipelines, and analytics stacks.' },
+      { t: 'Intelligent Solutions', b: 'Tailored builds using COTS platforms or proprietary cloud solutions.' },
+      { t: 'Effectiveness', b: 'Exploratory analysis to expose patterns, trends, and correlations.' },
+      { t: 'Reduced Cost', b: 'Optimal balance of capability and price with open-source tools where appropriate.' },
     ] },
   { id: 'it', no: '04', name: 'Enterprise IT Modernization & Custom Development',
     summary: 'Transform legacy systems with agile delivery, DevSecOps, and low/no-code platforms.',
@@ -111,6 +132,12 @@ IC.solutions = [
       { t: 'AI-Driven Automation', b: 'Embed AI/ML, NLP, RPA, and predictive analytics for intelligent, adaptive solutions.' },
       { t: 'Geospatial Intelligence', b: 'Esri ArcGIS, QGIS, and Mapbox integrations for spatial visualization and analysis.' },
       { t: 'Resilient & Secure Systems', b: 'Built-in fault isolation and strong security controls.' },
+    ],
+    advantage: [
+      { t: 'Skilled & Certified Teams', b: 'Proficient in Python, Java, JavaScript/TypeScript, React, Angular, Node.js, Spring Boot; expert in Agile, DevOps, and cloud-native delivery.' },
+      { t: 'Intelligent, Transparent Solutions', b: 'Design with clear traceability to mission goals and continuous stakeholder feedback.' },
+      { t: 'Operational Efficiency', b: 'Break down Dev–Ops silos, enabling shared accountability and high-performing, maintainable applications.' },
+      { t: 'Cost-Effective Modernization', b: 'Reduce technical debt and long-term maintenance through cloud-native, AI-enabled architectures.' },
     ] },
   { id: 'program', no: '05', name: 'Mission-Focused Program & Change Management',
     summary: 'Deliver complex programs with PMBOK-aligned execution, financial control, and training.',
@@ -124,6 +151,12 @@ IC.solutions = [
       { t: 'Financial Management & Cost Control', b: 'EVM, forecasting, and cost-benefit analysis.' },
       { t: 'Quality Management', b: 'ISO 9001:2015 practices and metrics-driven, performance-based management.' },
       { t: 'Business Process Reengineering', b: 'Optimizing operations aligned with mission outcomes — training 600+ users in two weeks.' },
+    ],
+    advantage: [
+      { t: 'Skilled & Certified Teams', b: 'PMBOK, Agile, and SAFe-trained program managers with federal and commercial portfolio experience.' },
+      { t: 'Integrated Program Dashboards', b: 'Real-time tracking of status, risks, dependencies, and milestones.' },
+      { t: 'Modern Collaboration Tools', b: 'Jira, Confluence, MS Project, and cloud PM platforms.' },
+      { t: 'Cost Optimization & Risk Control', b: 'Proactive management to reduce rework and drive savings.' },
     ] },
 ];
 
@@ -293,7 +326,7 @@ IC.solutionMotif = { ai: 'nodes', cloud: 'arcs', data: 'bars', it: 'grid', progr
 IC.productMotif = { geospatial: 'topo', semantic: 'nodes', assistant: 'flow' };
 
 /* Canvas viz scene per solution / product (see lib/canvasviz.jsx). */
-IC.solutionScene = { ai: 'network', cloud: 'accelerate', data: 'flow', it: 'network', program: 'accelerate' };
-IC.productScene = { geospatial: 'flow', semantic: 'network', assistant: 'accelerate' };
+IC.solutionScene = { ai: 'ai-net', cloud: 'cloud-tiers', data: 'data-grid', it: 'it-modules', program: 'program-timeline' };
+IC.productScene = { geospatial: 'geo-morph', semantic: 'semantic-morph', assistant: 'assistant-morph' };
 
 window.IC = IC;
