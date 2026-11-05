@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build:static",
+  "outputDirectory": "dist",
+  "cleanUrls": false,
+  "git": {
+    "deploymentEnabled": false
+  }
+}
