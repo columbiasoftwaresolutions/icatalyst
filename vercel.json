@@ -3,8 +3,6 @@
   "outputDirectory": "dist",
   "cleanUrls": false,
   "git": {
-    "deploymentEnabled": {
-      "codex/cloudflare-icatalyst-release": false
-    }
+    "deploymentEnabled": false
   }
 }
